@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="kamel3lom">
+  <defs>
+    <linearGradient id="g1" x1="10" y1="10" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#42D8FF" />
+      <stop offset="1" stop-color="#D7B26C" />
+    </linearGradient>
+    <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(24 18) rotate(45) scale(34)">
+      <stop stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="#08111E" stroke="#243446" stroke-width="1.5" />
+  <circle cx="32" cy="32" r="20" stroke="url(#g1)" stroke-width="2" />
+  <circle cx="32" cy="32" r="14" stroke="#42D8FF" stroke-opacity="0.22" stroke-width="1.5" />
+  <circle cx="24" cy="20" r="11" fill="url(#g2)" />
+  <path d="M20 41V23.5L27.1 33L36.4 23.5V41" stroke="url(#g1)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M40 28V38" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" />
+</svg>
