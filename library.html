@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المكتبة — برومتات البحث الأكاديمي | PromptAcademy</title>
+<meta name="description" content="تصفح أكثر من 65 برومت جاهز لـ ChatGPT موزعة على 10 أقسام أكاديمية: الموضوع، العنوان، الخلاصة، المقدمة، مراجعة الأدبيات، المنهجية، النتائج، المناقشة والاستنتاجات.">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="library-style-extra.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">📚 <span>Prompt</span>Academy</a>
+    <div class="nav-links">
+      <a href="index.html">الرئيسية</a>
+      <a href="library.html" class="active">المكتبة</a>
+      <a href="blog/index.html">المدونة</a>
+      <a href="about.html">حول الموقع</a>
+      <a href="contact.html">تواصل معنا</a>
+    </div>
+  </div>
+</nav>
+
+<section id="library" style="padding:56px 2rem; max-width:1200px; margin:0 auto;">
+  <h2 class="section-title">📂 مكتبة البرومتات</h2>
+  <p class="section-sub">تصفح حسب القسم أو ابحث مباشرة — اضغط على أي بطاقة لمعاينة البرومت كاملاً.</p>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="ابحث في البرومتات..." oninput="render()">
+    </div>
+    <div class="lang-group">
+      <button class="active" onclick="setLang('ar',this)">عربي</button>
+      <button onclick="setLang('en',this)">English</button>
+      <button onclick="setLang('both',this)">الاثنان</button>
+    </div>
+  </div>
+
+  <div class="cats" id="catsBar"></div>
+  <div class="prompts-grid" id="grid"></div>
+
+  <div class="stats-bar">
+    <div class="s">البرومتات الكلية: <b id="sTotal">0</b></div>
+    <div class="s">ظاهر الآن: <b id="sVisible">0</b></div>
+    <div class="s">نُسخ <b id="sCopied">0</b> برومت</div>
+  </div>
+</section>
+
+<footer>
+  <p>صُنع بـ ❤️ لمساعدة الباحثين العرب | <strong>PromptAcademy</strong> &copy; 2025</p>
+  <div class="footer-links">
+    <a href="about.html">حول الموقع</a>
+    <a href="contact.html">تواصل معنا</a>
+    <a href="privacy.html">سياسة الخصوصية</a>
+    <a href="terms.html">شروط الاستخدام</a>
+    <a href="blog/index.html">المدونة</a>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeIfOutside(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-head">
+      <h2 id="modalTitle">معاينة البرومت</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <button class="modal-copy-btn" id="modalCopyBtn" onclick="copyModal()">📋 نسخ البرومت</button>
+  </div>
+</div>
+
+<script>
+const CATS = [
+  {id:'all', label:'الكل'},
+  {id:'topic', label:'📌 الموضوع'},
+  {id:'title', label:'🏷️ العنوان'},
+  {id:'abstract', label:'📄 الخلاصة'},
+  {id:'keywords', label:'🔑 الكلمات المفتاحية'},
+  {id:'intro', label:'🚪 المقدمة'},
+  {id:'litreview', label:'📚 مراجعة الأدبيات'},
+  {id:'methodology', label:'⚙️ المنهجية'},
+  {id:'results', label:'📊 النتائج'},
+  {id:'discussion', label:'💬 المناقشة'},
+  {id:'conclusions', label:'✅ الاستنتاجات'},
+];
+
+const PROMPTS = [
+  {id:1,cat:'topic',num:1,ar:'بصفتك مستشاراً بحثياً، تتمثل مهمتك في تبادل الأفكار حول موضوعات بحثية محتملة لمشروع كتابة أكاديمي في "[مجال الدراسة]". ابدأ بتحديد الاتجاهات الحالية والفجوات والأسئلة الناشئة في هذا المجال والتي قد تؤدي إلى أبحاث مؤثرة. ضع في اعتبارك الأساليب متعددة التخصصات. قم بإنشاء قائمة تتضمن خمسة موضوعات بحثية مثيرة للاهتمام على الأقل، كل منها مصحوب بشرح موجز لأهميتها وأسئلة البحث المحتملة والمساهمة في المجال.',en:'As a research advisor, your task is to brainstorm potential research topics for an academic writing project in "[FIELD OF STUDY]." Begin by identifying current trends, gaps, and emerging questions within this field that could lead to impactful research. Consider interdisciplinary approaches. Generate a list of at least five interesting research topics, each accompanied by a brief explanation of its significance, potential research questions, and the contribution to the field.'},
+  {id:2,cat:'topic',num:2,ar:'قم بدور مستشار بحثي مكلف بتطوير أسئلة بحثية لورقة أكاديمية حول موضوع "[موضوع البحث]". ابدأ بتحديد الموضوعات الرئيسية والموضوعات الفرعية المتعلقة بموضوع البحث. قم بصياغة مجموعة من أسئلة البحث الشاملة التي تكون واضحة ومحددة.',en:'Assume the role of a research consultant tasked with developing research questions for an academic paper on the topic of "[RESEARCH TOPIC]." Start by identifying the major themes and subtopics related to the research topic that are ripe for exploration. Formulate a set of comprehensive research questions that are clear, focused, and conducive to in-depth academic investigation.'},
+  {id:3,cat:'topic',num:3,ar:'أرشدني في عملية العصف الذهني للأفكار الخاصة بموضوع بحثي في [مجال محدد].',en:'Guide me in brainstorming ideas for my research topic in [specific field].'},
+  {id:4,cat:'topic',num:4,ar:'ساعدني في تحسين أسئلة بحثي لدراسة حول [الموضوع المختار].',en:'Assist in refining my research questions for a study on [chosen subject].'},
+  {id:5,cat:'topic',num:5,ar:'اقترح بعض المواضيع المحتملة حول [موضوعك أو فكرتك] لورقة بحثية أكاديمية.',en:'Suggest some potential topics on [your subject or theme] for an academic paper.'},
+  {id:6,cat:'topic',num:6,ar:'اقترح بعض المواضيع المحتملة ضمن مجال [موضوعك] المتعلقة بـ [اهتمام أو موضوع محدد].',en:'Suggest some potential topics within the field of [your broader subject] related to [specific interest or theme].'},
+  {id:7,cat:'topic',num:7,ar:'أنا أستكشف مجال [موضوع، على سبيل المثال، "علم النفس"]. هل يمكنك اقتراح بعض المواضيع التي تتقاطع مع [اهتمام محدد، على سبيل المثال، "نمو الطفل"] وذات صلة بـ [سياق أو منطقة محددة، على سبيل المثال، "المناطق الحضرية في آسيا"]؟',en:'I\'m exploring the field of [subject, e.g., "psychology"]. Could you suggest some topics that intersect with [specific interest, e.g., "child development"] and are relevant to [specific context or region, e.g., "urban settings in Asia"]?'},
+  {id:8,cat:'topic',num:8,ar:'أحتاج إلى مساعدة في اختيار موضوع لمقالي الجدلي. يجب أن يكون مرتبطاً [بمجال موضوعك] وأن يكون حديثاً وذا صلة. هل يمكنك أيضاً اقتراح بعض الأفكار الفريدة؟',en:'I need help selecting a topic for my argumentative essay. It should be related to [your subject area] and something current and relevant. Can you also suggest some unique ideas?'},
+  {id:9,cat:'topic',num:9,ar:'أريد أن أكتب مقالاً في مجال [مجال تخصصك]. أعطني عشرة أفكار لموضوعات. وأريد أيضاً أن تكون مثيرة للتفكير وذات صلة بالقضايا الحالية.',en:'I want to write an essay in the field of [your subject area]. Give me ten topic ideas. Also, I want them to be thought-provoking and relevant to current issues.'},
+  {id:10,cat:'topic',num:10,ar:'أكتب أطروحة في [الموضوع]. هل يمكنك مساعدتي في التفكير في خمسة مواضيع محتملة جديدة وتوفر مساحة لمزيد من البحث؟',en:'I\'m writing a dissertation in [subject]. Can you help me brainstorm five potential topics that are new and offer room for further research?'},
+  {id:11,cat:'topic',num:11,ar:'ما هي بعض المواضيع الشائعة والمثيرة للاهتمام التي يمكنني الكتابة عنها في [مجال الدراسة]؟ أريد أيضاً شيئاً لم يتم الإفراط فيه.',en:'What are some trending and interesting topics I can write about in [field of study]? Also, I want something that has not been overdone.'},
+  {id:12,cat:'topic',num:12,ar:'اعمل كخبير في العصف الذهني. مهمتك هي العصف الذهني حول موضوعات بحثية محتملة تتعلق بـ [الموضوع]. الهدف هو توليد أسئلة بحثية فريدة ومثيرة للاهتمام لم يتم تناولها على نطاق واسع في الدراسات السابقة.',en:'Act as a brainstorming expert. Your task is to brainstorm potential research topics related to [topic]. The aim is to generate unique and interesting research questions that have not been extensively covered in previous studies.'},
+  {id:13,cat:'topic',num:13,ar:'باعتبارك باحثاً أكاديمياً متمرساً، فإن مهمتك هي تطوير أسئلة بحثية مقنعة حول [الموضوع]. يجب أن تكون هذه الأسئلة مثيرة للتفكير ومعقدة ومن المحتمل أن تؤدي إلى نتائج مهمة في هذا المجال. يجب أن تكون مفتوحة، ولكن مركزة وواضحة.',en:'As an experienced academic researcher, your task is to develop compelling research questions about [topic]. These questions should be thought-provoking, complex, and potentially lead to significant findings in the field. They should be open-ended, yet focused and clear.'},
+  {id:14,cat:'topic',num:14,ar:'أعمل على مشروع بحثي حول [أدخل الموضوع]. هل يمكنك اقتراح بعض الأسئلة أو الفرضيات البحثية المحتملة؟',en:'I\'m working on a research project about [insert topic]. Can you suggest some potential research questions or hypotheses?'},
+  {id:15,cat:'title',num:41,ar:'أعط 10 عناوين للموضوع التالي بناءً على فكرة الموضوع والغرض البحثي التالي: [أدخل بيانات حول فكرة الموضوع والغرض البحثي].',en:'Give 10 titles for the following topic based on the following topic idea and research purpose: [Insert data about the topic idea and research purpose].'},
+  {id:16,cat:'title',num:42,ar:'قدم 10 اقتراحات لعناوين بناءً على الغرض البحثي والنتائج التالية: [أدخل بيانات حول بيان البحث والنتائج].',en:'Provide 10 title suggestions based on the following research purpose and findings: [Insert data about the research statement and findings].'},
+  {id:17,cat:'title',num:43,ar:'قدم 5 بدائل للعنوان التالي دون تغيير المعنى: [أدخل العنوان].',en:'Give 5 alternatives for the following title without changing the meaning: [Insert the title].'},
+  {id:18,cat:'title',num:44,ar:'قدم 5 اقتراحات لعناوين حول الموضوع [أدخل اسم الموضوع] وأدرج الكلمة المفتاحية [أدخل الكلمة المفتاحية] في جميع اقتراحات العناوين.',en:'Provide 5 title suggestions on the topic [Insert topic name] and include the keyword [Insert keyword] in all title suggestions.'},
+  {id:19,cat:'title',num:45,ar:'اقترح بعض العناوين المثيرة للاهتمام لورقة بحثية حول [موضوع محدد]. بالإضافة إلى ذلك، يجب أن تكون احترافية وجذابة.',en:'Suggest some interesting titles for a research paper on [specific subject]. In addition, it should be professional but engaging.'},
+  {id:20,cat:'title',num:46,ar:'أحتاج إلى مساعدة في إنشاء عنوان لمقالي حول [الموضوع]. يجب أن يكون العنوان موجزاً ولكن يعطي إشارة واضحة للمحتوى.',en:'I need help creating a title for my essay on [topic]. It should be concise but give a clear indication of the content.'},
+  {id:21,cat:'title',num:47,ar:'ما هي بعض أفكار العناوين لأطروحتي حول [الموضوع]؟ يجب أن تبدو ذات طابع أكاديمي وأن تنقل أهمية بحثي.',en:'What are some title ideas for my thesis on [subject]? It needs to sound academic and convey the significance of my research.'},
+  {id:22,cat:'title',num:48,ar:'اقترح 5 عناوين للملخص التالي: [فقرة الملخص].',en:'Suggest 5 titles for the following abstract: [ABSTRACT PARAGRAPH].'},
+  {id:23,cat:'title',num:65,ar:'ولّد أفكار لعنوان جذاب لمقالتي البحثية حول [موضوع محدد].',en:'Generate ideas for a captivating title for my research paper on [specific subject].'},
+  {id:24,cat:'abstract',num:66,ar:'اعمل كخبير في البحث الأكاديمي. قم بصياغة ملخص لورقة بحثية بعنوان [العنوان]. يجب أن يلخص الملخص بإيجاز الأهداف الرئيسية والمنهجيات والنتائج الرئيسية والآثار المترتبة على البحث. تأكد من الوضوح والتماسك والإيجاز مع الالتزام بالمبادئ التوجيهية للمجال الأكاديمي.',en:'Act as an academic research expert. Draft an abstract for a research paper titled [title]. The abstract should succinctly summarize the main objectives, methodologies, key findings, and implications of the research. Ensure clarity, coherence, and conciseness while adhering to the specific guidelines and conventions of the academic field.'},
+  {id:25,cat:'abstract',num:67,ar:'اكتب ملخصاً لورقة بحثية تتناول [موضوع البحث].',en:'Write an abstract for a research paper investigating [RESEARCH TOPIC].'},
+  {id:26,cat:'abstract',num:68,ar:'قم بإعداد مسودة ملخص لبحث مراجعة يناقش [موضوع البحث].',en:'Draft an abstract for a review paper discussing [RESEARCH TOPIC].'},
+  {id:27,cat:'abstract',num:73,ar:'ساعدني في كتابة ملخص لبحثي حول [الموضوع]. يجب أن يلخص الملخص الغرض والمنهجية والنتائج الرئيسية بالإضافة إلى الاستنتاج في 150-250 كلمة.',en:'Help me write an abstract for my research on [topic]. It should summarise the purpose, methodology, key findings, as well as conclusion in 150-250 words.'},
+  {id:28,cat:'abstract',num:74,ar:'هل يمكنك إنشاء ملخص واضح وموجز لدراستي حول [الموضوع]، مع التركيز على سؤال البحث والأساليب والنتائج والآثار المترتبة عليه؟',en:'Can you create a clear and concise abstract for my study on [subject], focusing on the research question, methods, results, and implications?'},
+  {id:29,cat:'abstract',num:75,ar:'اكتب ملخصاً يلخص بحثي حول [الموضوع]. يجب عليك أيضاً تضمين الخلفية والأهداف والمنهجية والنتائج الرئيسية.',en:'Write an abstract that summarises my research on [topic]. You should also include the background, objectives, methodology, and key findings.'},
+  {id:30,cat:'abstract',num:97,ar:'اكتب جملة نهائية لملخصي تلخص الاستنتاج الرئيسي وتأثير دراستي على [الموضوع].',en:'Write a final sentence for my abstract that summarises the main conclusion and the impact of my study on [topic].'},
+  {id:31,cat:'keywords',num:98,ar:'قم بإنشاء قائمة بالكلمات المفتاحية ذات الصلة ببحثي حول [موضوع محدد].',en:'Generate a list of relevant keywords for my research on [specific topic].'},
+  {id:32,cat:'keywords',num:99,ar:'أدخل 5 كلمات مفتاحية لهذا: [الفقرات].',en:'Provide 5 keywords for this: [PARAGRAPHS].'},
+  {id:33,cat:'keywords',num:100,ar:'قم بإنشاء قائمة بالكلمات المفتاحية المحتملة لتحسين ظهور بحثي في محركات البحث.',en:'Generate a list of potential keywords for optimizing my research paper\'s visibility.'},
+  {id:34,cat:'keywords',num:102,ar:'هل يمكنك تقديم قائمة بالكلمات المفتاحية ذات الصلة بمقال أكاديمي حول [الموضوع]؟',en:'Can you provide a list of relevant keywords for an academic paper on [topic]?'},
+  {id:35,cat:'keywords',num:105,ar:'قم بإنشاء مجموعة من الكلمات المفتاحية المتعلقة بتقاطع [تخصصين أكاديميين، على سبيل المثال، الذكاء الاصطناعي والرعاية الصحية].',en:'Generate a set of keywords related to the intersection of [two academic disciplines, e.g., artificial intelligence and healthcare].'},
+  {id:36,cat:'keywords',num:109,ar:'أدرج الكلمات المفتاحية المرتبطة بالتطورات الأخيرة في [التكنولوجيا أو العلوم أو أي مجال بحثي محدد].',en:'List keywords associated with recent advancements in [technology, science, or any specific research area].'},
+  {id:37,cat:'intro',num:111,ar:'قم بدور الباحث الأكاديمي المكلف بكتابة مقدمة بحث علمي. هدفك هو صياغة مقدمة تضع [موضوع البحث] في سياق الخطاب الأكاديمي الأوسع، وتحدد أهمية الدراسة، وتوضح أسئلة البحث أو الفرضيات. ابدأ بتقديم لمحة عامة عن الفهم الحالي والفجوات في الأدبيات.',en:'Assume the role of an academic researcher tasked with writing the introduction to a scholarly paper. Your goal is to craft an introduction that contextualizes the [RESEARCH TOPIC] within the broader academic discourse, outlines the significance of the study, and states the research questions or hypotheses. Begin by presenting an overview of the current understanding and gaps in the literature.'},
+  {id:38,cat:'intro',num:112,ar:'ساعدني في صياغة مقدمة مقنعة لمقترح بحث حول [موضوع محدد].',en:'Assist in crafting a compelling introduction for a research proposal on [specific subject].'},
+  {id:39,cat:'intro',num:121,ar:'اكتب مقدمة لمقال عن [الموضوع] تسلط الضوء على أهمية الموضوع وأيضاً ما أهدف إلى تحقيقه من خلال بحثي.',en:'Write an introduction for an essay on [subject] that highlight the importance of the topic and also what I aim to achieve through my research.'},
+  {id:40,cat:'intro',num:122,ar:'أحتاج إلى مقدمة أكاديمية لمقال عن [الموضوع]. يجب أن تقدم السؤال الرئيسي وتلخص النقاط الرئيسية التي سأغطيها.',en:'I need an academic introduction for a paper on [topic]. It should present the key question and summarise the main points I will cover.'},
+  {id:41,cat:'intro',num:125,ar:'اكتب مقدمة لموضوع البحث التالي: [جملة الموضوع].',en:'Come up with an introduction for the following research topic: [TOPIC SENTENCE].'},
+  {id:42,cat:'intro',num:137,ar:'قم بإنشاء مقدمة جذابة لعرض تقديمي حول نتائج بحثي.',en:'Create an engaging introduction for a presentation on my research findings.'},
+  {id:43,cat:'litreview',num:138,ar:'تبنّ دور الباحث الذي يجري مراجعة شاملة للأدبيات لورقة أكاديمية حول [موضوع البحث]. تتضمن مهمتك تحديد وتحليل وتلخيص النتائج والنظريات والمنهجيات الرئيسية من مجموعة متنوعة من المصادر المتعلقة بالموضوع. ابدأ بصياغة سؤال بحث بسيط يوجه نطاق مراجعتك.',en:'Adopt the role of a researcher conducting a comprehensive literature review for an academic paper on [RESEARCH TOPIC]. Your task involves identifying, analyzing, and synthesizing key findings, theories, and methodologies from a diverse range of sources related to the topic. Begin by formulating a simple research question or thesis statement that guides the scope of your review.'},
+  {id:44,cat:'litreview',num:140,ar:'هل يمكنك مساعدتي في تحديد الفجوات الموجودة في الأدبيات الحالية حول [الموضوع]؟ أحتاج إلى الإشارة إلى المجالات التي تتطلب المزيد من البحث.',en:'Can you help me identify the gaps in the current literature on [topic]? I need to point out areas where further research is required.'},
+  {id:45,cat:'litreview',num:144,ar:'اكتب مراجعة للأدبيات تنظم البحث حول [الموضوع] في الموضوعات الرئيسية الثلاثة التالية: [الموضوع 1]، [الموضوع 2]، و[الموضوع 3].',en:'Write a literature review that organises the research on [topic] into the following three main themes: [Theme 1], [Theme 2], and [Theme 3].'},
+  {id:46,cat:'litreview',num:153,ar:'أعط لمحة موجزة عن الأبحاث التي أجريت حول [موضوعك].',en:'Give a brief overview of research done on [your topic].'},
+  {id:47,cat:'litreview',num:154,ar:'أنشئ ملخصاً لهذه الورقة البحثية: [النص].',en:'Generate a summary of this research paper: [text].'},
+  {id:48,cat:'litreview',num:180,ar:'ساعدني في كتابة مراجعة للأدبيات حول [الموضوع]. أحتاج أيضاً إلى النتائج الرئيسية والمنهجيات والفجوات في البحث.',en:'Help me write a literature review on [topic]. I also need key findings, methodologies, and gaps in the research.'},
+  {id:49,cat:'litreview',num:183,ar:'قم بإجراء مراجعة للأدبيات حول [جملة الموضوع] وقم بتوفير مراجع لأوراق المراجعة.',en:'Conduct a literature review on [TOPIC SENTENCE] and provide review paper references.'},
+  {id:50,cat:'litreview',num:238,ar:'اشرح هذا مرة أخرى ولكن بطريقة أبسط: [فقرات].',en:'Explain this again but simpler: [PARAGRAPHS].'},
+  {id:51,cat:'methodology',num:257,ar:'اعمل كخبير في البحث الأكاديمي. مهمتك هي اقتراح منهجيات مناسبة للبحث في [الموضوع]. تقديم قائمة شاملة لكل من طرق البحث النوعية والكمية التي تناسب موضوع البحث. برر أهمية كل منهجية ومزاياها المحتملة.',en:'Act as an academic research expert. Your task is to suggest appropriate methodologies for researching [topic]. Provide a comprehensive list of both qualitative and quantitative research methods that are best suited for the subject matter. Justify each methodology\'s relevance and potential advantages.'},
+  {id:52,cat:'methodology',num:260,ar:'اقترح منهجيات مناسبة لدراسة [سؤال البحث الخاص بك].',en:'Suggest appropriate methodologies for studying [your research question].'},
+  {id:53,cat:'methodology',num:262,ar:'أحتاج إلى مساعدة في كتابة قسم المنهجية لمقال بحثي. قم بتحليل نقاط القوة والضعف في استخدام [منهجيتك] لدراسة [الموضوع].',en:'I need help writing a methodology section for my research article. Analyze the strengths and weaknesses of using [your methodology] to study [topic].'},
+  {id:54,cat:'methodology',num:266,ar:'ساعدني في كتابة قسم منهجية البحث الواضحة والموجزة لدراستي حول [الموضوع]. كما يتضمن تصميم البحث وجمع البيانات وطرق التحليل.',en:'Help me write a clear and concise research methodology section for my study on [topic]. It also includes my research design, data collection, and analysis methods.'},
+  {id:55,cat:'methodology',num:268,ar:'اكتب قسم منهجية البحث الذي يحدد الخطوات التي سأتخذها للتحقيق في [الموضوع]. كما يتضمن تفاصيل حول كيفية جمع البيانات وتحليلها.',en:'Write a research methodology section that outlines the steps I will take to investigate [topic]. Also, include details on how I will collect and analyse the data.'},
+  {id:56,cat:'methodology',num:270,ar:'اكتب منهجية مفصلة للموضوع: [جملة الموضوع].',en:'Write a detailed methodology for the topic: [TOPIC SENTENCE].'},
+  {id:57,cat:'results',num:303,ar:'لخّص النتائج الرئيسية من بياناتي لقسم النتائج في مقالتي البحثية: [بياناتك].',en:'Summarize key findings from my data for the results section of my research article: [your data].'},
+  {id:58,cat:'results',num:304,ar:'اكتب قسم النتائج للفقرات التالية. يرجى كتابة ذلك بصيغة الغائب. [الفقرات].',en:'Write a result section for the following paragraphs. Please write this in the third person. [PARAGRAPHS].'},
+  {id:59,cat:'results',num:333,ar:'ساعدني في كتابة قسم "النتائج" لدراستي حول [الموضوع]. أريد تقديم النتائج التي توصلت إليها بوضوح ودقة دون تفسير.',en:'Help me write the Results section for my study on [topic]. I want to present my findings clearly and concisely without interpretation.'},
+  {id:60,cat:'results',num:334,ar:'هل يمكنك تلخيص النتائج الرئيسية لبحثي حول [الموضوع] وتقديمها بطريقة منظمة لقسم النتائج؟',en:'Can you summarise the key findings of my research on [subject] and present them in an organised manner for the results section?'},
+  {id:61,cat:'discussion',num:336,ar:'ناقش هذه النتائج: [فقرات النتائج].',en:'Discuss these results: [RESULT PARAGRAPHS].'},
+  {id:62,cat:'discussion',num:337,ar:'ناقش آثار هذه النتائج: [نتائجك].',en:'Discuss the implications of these results: [your results].'},
+  {id:63,cat:'discussion',num:349,ar:'ساعدني في كتابة قسم "المناقشة" لبحثي حول [الموضوع]. أحتاج إلى شرح معنى النتائج وكيف ترتبط بسؤال البحث الأصلي.',en:'Help me write the Discussion section for my research on [topic]. I need to explain what the results mean and how they relate to my original research question.'},
+  {id:64,cat:'discussion',num:352,ar:'اكتب مناقشة لمقارنة النتائج التي توصلت إليها حول [الموضوع] بالبحث الحالي. أحتاج إلى توضيح مكانة نتائجي في الأدبيات الأوسع.',en:'Write a discussion comparing my findings on [topic] with the existing research. I need to explain where my results fit into the broader literature.'},
+  {id:65,cat:'conclusions',num:365,ar:'قم بإنشاء استنتاج موجز لمقالتي البحثية: [نصك].',en:'Generate a concise conclusion for my research article: [your text].'},
+  {id:66,cat:'conclusions',num:366,ar:'اقترح مجالات للبحث في المستقبل بناءً على النتائج الرئيسية التي توصلت إليها: [نتائجك].',en:'Suggest areas for future research based on my key findings: [your findings].'},
+  {id:67,cat:'conclusions',num:367,ar:'قدّم توصيات بشأن السياسات أو الممارسات بناءً على نتائج بحثي: [نتائجك].',en:'Give recommendations for policy or practice based on my research results: [your results].'},
+  {id:68,cat:'conclusions',num:368,ar:'قم بإنشاء استنتاج لهذا: [الفقرات].',en:'Generate a conclusion for this: [PARAGRAPHS].'},
+  {id:69,cat:'conclusions',num:378,ar:'أنشئ استنتاجاً من [أدخل عدد الكلمات] كلمة من خلال تحليل النتائج التالية والتداعيات والتوصيات للبحوث المستقبلية والنقاط الرئيسية.',en:'Create a conclusion of [Insert word count] by analyzing the following findings, implications, recommendations for future research, and key takeaways.'},
+];
+
+let lang = 'ar';
+let cat = 'all';
+let copies = 0;
+let modalText = '';
+
+function getText(p) {
+  if(lang==='ar') return p.ar;
+  if(lang==='en') return p.en;
+  return p.ar + '\n\n────────────────\n\n' + p.en;
+}
+
+function getCatLabel(id) {
+  const c = CATS.find(x=>x.id===id);
+  return c ? c.label : '';
+}
+
+function buildCats() {
+  const bar = document.getElementById('catsBar');
+  bar.innerHTML = CATS.map(c => {
+    const count = c.id==='all' ? PROMPTS.length : PROMPTS.filter(p=>p.cat===c.id).length;
+    return `<button class="cat-pill${c.id===cat?' active':''}" data-cat="${c.id}" onclick="setCat('${c.id}',this)">${c.label} (${count})</button>`;
+  }).join('');
+}
+
+function setCat(id, btn) {
+  cat = id;
+  document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function setLang(l, btn) {
+  lang = l;
+  document.querySelectorAll('.lang-group button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  return PROMPTS.filter(p => {
+    const catOk = cat==='all' || p.cat===cat;
+    const searchOk = !q || p.ar.includes(q) || p.en.toLowerCase().includes(q);
+    return catOk && searchOk;
+  });
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  const filtered = getFiltered();
+  document.getElementById('sVisible').textContent = filtered.length;
+  document.getElementById('sTotal').textContent = PROMPTS.length;
+
+  if(!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><p>لا توجد برومتات تطابق بحثك</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => {
+    const txt = getText(p);
+    const catLbl = getCatLabel(p.cat);
+    return `<div class="p-card" onclick="openModal(${p.id})">
+      <div class="p-cat-tag">${catLbl}</div>
+      <div class="p-text">${txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div class="p-footer">
+        <button class="copy-btn" id="cb-${p.id}" onclick="copyCard(${p.id},event)">📋 نسخ</button>
+        <span class="p-num">#${p.num}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyCard(id, e) {
+  e.stopPropagation();
+  const p = PROMPTS.find(x=>x.id===id);
+  if(!p) return;
+  navigator.clipboard.writeText(getText(p)).then(()=>{
+    copies++;
+    document.getElementById('sCopied').textContent = copies;
+    const btn = document.getElementById('cb-'+id);
+    if(btn) {
+      btn.classList.add('copied');
+      btn.textContent = '✅ تم النسخ';
+      setTimeout(()=>{ btn.classList.remove('copied'); btn.textContent = '📋 نسخ'; }, 2000);
+    }
+  });
+}
+
+function openModal(id) {
+  const p = PROMPTS.find(x=>x.id===id);
+  if(!p) return;
+  modalText = getText(p);
+  document.getElementById('modalTitle').textContent = getCatLabel(p.cat) + ' — برومت رقم #' + p.num;
+  document.getElementById('modalBody').textContent = modalText;
+  const btn = document.getElementById('modalCopyBtn');
+  btn.textContent = '📋 نسخ البرومت';
+  btn.classList.remove('copied');
+  btn.style.background = '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function closeIfOutside(e) {
+  if(e.target.id==='modalOverlay') closeModal();
+}
+
+function copyModal() {
+  navigator.clipboard.writeText(modalText).then(()=>{
+    copies++;
+    document.getElementById('sCopied').textContent = copies;
+    const btn = document.getElementById('modalCopyBtn');
+    btn.textContent = '✅ تم النسخ بنجاح!';
+    btn.style.background = '#16a34a';
+    setTimeout(()=>{
+      btn.textContent = '📋 نسخ البرومت';
+      btn.style.background = '';
+    }, 2500);
+  });
+}
+
+function setActive(a) {
+  document.querySelectorAll('.nav-links a').forEach(x=>x.classList.remove('active'));
+  a.classList.add('active');
+}
+
+// Init
+buildCats();
+
+// Support deep-linking from homepage e.g. library.html#methodology
+const hash = window.location.hash.replace('#','');
+if(hash && CATS.find(c=>c.id===hash)) {
+  cat = hash;
+  document.querySelectorAll('.cat-pill').forEach(b=>{
+    if(b.getAttribute('data-cat')===hash) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+}
+render();
+</script>
+</body>
+</html>

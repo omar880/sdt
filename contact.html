@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تواصل معنا | PromptAcademy</title>
+<meta name="description" content="تواصل مع فريق PromptAcademy لإرسال اقتراحاتك، ملاحظاتك، أو طلبات التعاون والشراكة.">
+<link rel="stylesheet" href="style.css">
+<style>
+.form-success {
+  display:none; text-align:center; padding:32px; background:var(--green-light);
+  border:1.5px solid #86efac; border-radius:var(--radius); color:var(--green); font-size:16px; font-weight:600;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">📚 <span>Prompt</span>Academy</a>
+    <div class="nav-links">
+      <a href="index.html">الرئيسية</a>
+      <a href="library.html">المكتبة</a>
+      <a href="blog/index.html">المدونة</a>
+      <a href="about.html">حول الموقع</a>
+      <a href="contact.html" class="active">تواصل معنا</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>تواصل معنا</h1>
+  <p>هل لديك اقتراح، ملاحظة، أو برومت تريد إضافته؟ نسمعك دائماً</p>
+</div>
+
+<div class="container-narrow">
+  <div class="contact-info">
+    <div style="font-size:28px;">📧</div>
+    <div>
+      <div style="font-size:13px;color:var(--gray-600);">البريد الإلكتروني المباشر</div>
+      <a href="mailto:sdtoun7@gmail.com" style="color:var(--blue-mid); font-weight:600; font-size:15px; text-decoration:none;">sdtoun7@gmail.com</a>
+    </div>
+  </div>
+
+  <form class="contact-form" onsubmit="submitForm(event)" id="contactForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fname">الاسم</label>
+        <input type="text" id="fname" placeholder="اسمك الكريم" required>
+      </div>
+      <div class="form-group">
+        <label for="femail">البريد الإلكتروني</label>
+        <input type="email" id="femail" placeholder="email@example.com" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="ftype">نوع الرسالة</label>
+      <select id="ftype">
+        <option value="suggestion">اقتراح برومت جديد</option>
+        <option value="feedback">ملاحظة على برومت موجود</option>
+        <option value="collab">تعاون أو شراكة</option>
+        <option value="other">أخرى</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="fmsg">رسالتك</label>
+      <textarea id="fmsg" placeholder="اكتب رسالتك هنا..." required></textarea>
+    </div>
+    <button type="submit" class="submit-btn">إرسال الرسالة ✉️</button>
+  </form>
+  <div class="form-success" id="formSuccess">
+    ✅ شكراً! سيتم فتح برنامج البريد الإلكتروني لإرسال رسالتك إلى sdtoun7@gmail.com
+  </div>
+</div>
+
+<footer>
+  <p>صُنع بـ ❤️ لمساعدة الباحثين العرب | <strong>PromptAcademy</strong> &copy; 2025</p>
+  <div class="footer-links">
+    <a href="about.html">حول الموقع</a>
+    <a href="contact.html">تواصل معنا</a>
+    <a href="privacy.html">سياسة الخصوصية</a>
+    <a href="terms.html">شروط الاستخدام</a>
+    <a href="blog/index.html">المدونة</a>
+  </div>
+</footer>
+
+<script>
+function submitForm(e) {
+  e.preventDefault();
+  const name = document.getElementById('fname').value;
+  const email = document.getElementById('femail').value;
+  const type = document.getElementById('ftype').value;
+  const msg = document.getElementById('fmsg').value;
+
+  const typeLabels = {
+    suggestion: 'اقتراح برومت جديد',
+    feedback: 'ملاحظة على برومت موجود',
+    collab: 'تعاون أو شراكة',
+    other: 'أخرى'
+  };
+
+  const subject = encodeURIComponent('رسالة من PromptAcademy: ' + typeLabels[type]);
+  const body = encodeURIComponent('الاسم: ' + name + '\nالبريد: ' + email + '\nنوع الرسالة: ' + typeLabels[type] + '\n\nالرسالة:\n' + msg);
+
+  window.location.href = 'mailto:sdtoun7@gmail.com?subject=' + subject + '&body=' + body;
+
+  document.getElementById('contactForm').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+}
+</script>
+
+</body>
+</html>

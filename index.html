@@ -3,1222 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SDTORA PRO — المتجر الرقمي وإدارة المحفظة</title>
-<meta name="description" content="SDTORA PRO — برنامج سطح مكتب احترافي لإدارة المتجر الرقمي والمحفظة الإلكترونية">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<title>PromptAcademy — مكتبة برومتات البحث الأكاديمي لـ ChatGPT</title>
+<meta name="description" content="أكثر من 65 برومت جاهز لـ ChatGPT لمساعدتك في كتابة بحثك الأكاديمي، من اختيار الموضوع وحتى الاستنتاجات. مجاني وثنائي اللغة.">
+<link rel="stylesheet" href="style.css">
 <style>
-:root {
-  --bg:        #020817;
-  --bg2:       #0a1628;
-  --bg3:       #0f1f3d;
-  --accent:    #3b82f6;
-  --accent2:   #06b6d4;
-  --green:     #22c55e;
-  --purple:    #a855f7;
-  --gold:      #f59e0b;
-  --text:      #f0f6ff;
-  --muted:     #64748b;
-  --border:    rgba(59,130,246,0.2);
-  --glow:      0 0 40px rgba(59,130,246,0.3);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Tajawal', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow-x: hidden;
-  line-height: 1.7;
-}
-
-/* ── NOISE OVERLAY ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.5;
-}
-
-/* ── GRID BACKGROUND ── */
-.grid-bg {
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ── GLOW ORBS ── */
-.orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  z-index: 0;
-  animation: orbFloat 8s ease-in-out infinite;
-}
-.orb-1 { width: 600px; height: 600px; background: rgba(59,130,246,0.08); top: -200px; right: -200px; animation-delay: 0s; }
-.orb-2 { width: 400px; height: 400px; background: rgba(168,85,247,0.06); bottom: 200px; left: -150px; animation-delay: 3s; }
-.orb-3 { width: 300px; height: 300px; background: rgba(6,182,212,0.06); top: 50%; left: 50%; animation-delay: 6s; }
-
-@keyframes orbFloat {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50% { transform: translateY(-30px) scale(1.05); }
-}
-
-/* ── NAVBAR ── */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 16px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(2,8,23,0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-}
-
-.nav-logo {
-  font-family: 'Orbitron', monospace;
-  font-size: 20px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 2px;
-}
-
-.nav-links { display: flex; gap: 32px; align-items: center; }
-.nav-links a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-.nav-links a:hover { color: var(--text); }
-
-.lang-btn {
-  background: var(--border);
-  border: 1px solid var(--border);
-  color: var(--accent);
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  transition: all 0.3s;
-}
-.lang-btn:hover { background: var(--accent); color: white; }
-
-/* ── HERO ── */
-#hero {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 120px 40px 80px;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(59,130,246,0.1);
-  border: 1px solid rgba(59,130,246,0.3);
-  padding: 8px 20px;
-  border-radius: 100px;
-  font-size: 13px;
-  color: var(--accent2);
-  margin-bottom: 32px;
-  animation: fadeInDown 0.8s ease forwards;
-  font-family: 'Space Mono', monospace;
-}
-
-.hero-badge::before {
-  content: '';
-  width: 8px; height: 8px;
-  background: var(--green);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--green);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
-.hero-title {
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(48px, 8vw, 96px);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  margin-bottom: 12px;
-  animation: fadeInUp 0.8s ease 0.2s both;
-}
-
-.hero-title .gradient-text {
-  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% 200%;
-  animation: gradientShift 4s ease infinite;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.hero-subtitle-ar {
-  font-size: clamp(18px, 3vw, 26px);
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-  animation: fadeInUp 0.8s ease 0.3s both;
-}
-
-.hero-subtitle-en {
-  font-family: 'Space Mono', monospace;
-  font-size: clamp(11px, 1.5vw, 14px);
-  color: var(--muted);
-  margin-bottom: 32px;
-  animation: fadeInUp 0.8s ease 0.35s both;
-}
-
-.hero-desc {
-  font-size: 17px;
-  color: var(--muted);
-  max-width: 640px;
-  margin: 0 auto 48px;
-  line-height: 1.8;
-  animation: fadeInUp 0.8s ease 0.4s both;
-}
-
-.hero-btns {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-  animation: fadeInUp 0.8s ease 0.5s both;
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, var(--accent), #2563eb);
+#home {
+  background: linear-gradient(135deg, var(--blue-deep) 0%, #1e4da1 50%, #2563eb 100%);
   color: white;
-  padding: 16px 36px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 700;
-  transition: all 0.3s;
-  box-shadow: 0 8px 32px rgba(59,130,246,0.4);
-  border: none;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(59,130,246,0.5); }
-.btn-primary:hover::before { opacity: 1; }
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: transparent;
-  color: var(--text);
-  padding: 16px 36px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  transition: all 0.3s;
-  cursor: pointer;
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: rgba(59,130,246,0.05); }
-
-/* ── STATS ── */
-.hero-stats {
-  display: flex;
-  gap: 48px;
-  justify-content: center;
-  margin-top: 64px;
-  flex-wrap: wrap;
-  animation: fadeInUp 0.8s ease 0.6s both;
-}
-
-.stat-item { text-align: center; }
-.stat-num {
-  font-family: 'Orbitron', monospace;
-  font-size: 32px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-/* ── SCREENSHOT MOCKUP ── */
-.mockup-container {
-  position: relative;
-  z-index: 1;
-  padding: 80px 40px;
-  display: flex;
-  justify-content: center;
-}
-
-.mockup-window {
-  width: 100%;
-  max-width: 900px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 40px 120px rgba(0,0,0,0.8), var(--glow);
-  animation: fadeInUp 1s ease 0.3s both;
-  position: relative;
-}
-
-.mockup-bar {
-  background: var(--bg3);
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.mockup-dots { display: flex; gap: 8px; }
-.mockup-dot {
-  width: 12px; height: 12px;
-  border-radius: 50%;
-}
-.dot-r { background: #ff5f57; }
-.dot-y { background: #febc2e; }
-.dot-g { background: #28c840; }
-
-.mockup-title {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: var(--muted);
-  flex: 1;
-  text-align: center;
-}
-
-.mockup-body {
-  display: flex;
-  min-height: 440px;
-}
-
-.mockup-sidebar {
-  width: 200px;
-  background: #0d1b36;
-  border-left: 1px solid var(--border);
-  padding: 20px 0;
-  flex-shrink: 0;
-}
-
-.sidebar-logo {
-  font-family: 'Orbitron', monospace;
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--accent);
-  padding: 0 16px 20px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-.sidebar-item {
-  padding: 10px 16px;
-  font-size: 13px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.sidebar-item:hover, .sidebar-item.active {
-  background: rgba(59,130,246,0.1);
-  color: var(--text);
-}
-.sidebar-item.active { border-right: 3px solid var(--accent); }
-
-.mockup-content { flex: 1; padding: 24px; }
-
-.mockup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.mockup-page-title { font-size: 20px; font-weight: 700; }
-
-.mockup-balance {
-  background: rgba(34,197,94,0.1);
-  border: 1px solid rgba(34,197,94,0.3);
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-family: 'Space Mono', monospace;
-  font-size: 14px;
-  color: var(--green);
-}
-
-.mockup-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.mockup-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-}
-
-.mockup-card-icon { font-size: 24px; margin-bottom: 8px; }
-.mockup-card-name { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.mockup-card-price { font-size: 14px; font-weight: 700; color: var(--green); }
-
-.mockup-table {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.mockup-table-row {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  font-size: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  gap: 16px;
-}
-
-.mockup-table-row:last-child { border-bottom: none; }
-.mockup-table-row.header { color: var(--muted); background: rgba(255,255,255,0.02); }
-
-.tx-type { width: 80px; }
-.tx-amount { width: 100px; font-family: 'Space Mono', monospace; }
-.tx-send { color: #ef4444; }
-.tx-recv { color: var(--green); }
-.tx-desc { flex: 1; color: var(--muted); }
-.tx-status { color: var(--green); font-size: 11px; }
-
-/* ── FEATURES ── */
-#features {
-  position: relative;
-  z-index: 1;
-  padding: 100px 40px;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.section-tag {
-  display: inline-block;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--accent);
-  background: rgba(59,130,246,0.1);
-  border: 1px solid rgba(59,130,246,0.2);
-  padding: 6px 16px;
-  border-radius: 100px;
-  margin-bottom: 16px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.section-title {
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: 800;
-  margin-bottom: 16px;
-  line-height: 1.2;
-}
-
-.section-desc { font-size: 17px; color: var(--muted); max-width: 560px; margin: 0 auto; }
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.feature-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  transition: all 0.4s;
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.feature-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(59,130,246,0.4);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(59,130,246,0.1);
-}
-.feature-card:hover::before { opacity: 1; }
-
-.feature-icon {
-  width: 56px; height: 56px;
-  background: rgba(59,130,246,0.1);
-  border: 1px solid rgba(59,130,246,0.2);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  margin-bottom: 20px;
-}
-
-.feature-title-ar { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-.feature-title-en {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--accent);
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-}
-.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
-
-/* ── SPECS ── */
-#specs {
-  position: relative;
-  z-index: 1;
-  padding: 100px 40px;
-  background: linear-gradient(180deg, transparent, rgba(10,22,40,0.8), transparent);
-}
-
-.specs-container {
-  max-width: 900px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-
-.spec-group h3 {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.spec-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-size: 14px;
-}
-
-.spec-key { color: var(--muted); }
-.spec-val { color: var(--text); font-weight: 600; }
-.spec-val.green { color: var(--green); }
-.spec-val.blue { color: var(--accent); }
-
-/* ── DOWNLOAD ── */
-#download {
-  position: relative;
-  z-index: 1;
-  padding: 100px 40px;
-}
-
-.download-card {
-  max-width: 800px;
-  margin: 0 auto;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 60px;
+  padding: 80px 2rem 70px;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
-
-.download-card::before {
-  content: '';
-  position: absolute;
-  top: -1px; left: 20%; right: 20%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
-}
-
-.download-glow {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(59,130,246,0.06), transparent 70%);
-  pointer-events: none;
-}
-
-.download-icon { font-size: 64px; margin-bottom: 24px; }
-.download-title { font-size: 36px; font-weight: 800; margin-bottom: 8px; }
-.download-subtitle { color: var(--muted); margin-bottom: 12px; font-size: 15px; }
-.download-version {
-  display: inline-block;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: var(--accent);
-  background: rgba(59,130,246,0.1);
-  padding: 4px 12px;
-  border-radius: 100px;
-  margin-bottom: 40px;
-}
-
-.download-info {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 40px;
-  flex-wrap: wrap;
-}
-
-.dl-info-item { text-align: center; }
-.dl-info-val {
-  font-family: 'Space Mono', monospace;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--accent2);
-}
-.dl-info-key { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-/* ── HOW TO ── */
-#howto {
-  position: relative;
-  z-index: 1;
-  padding: 100px 40px;
-}
-
-.steps-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.step {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 40px;
-  align-items: flex-start;
-}
-
-.step-num {
-  width: 48px; height: 48px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Orbitron', monospace;
-  font-size: 18px;
-  font-weight: 900;
-  flex-shrink: 0;
-  box-shadow: 0 8px 24px rgba(59,130,246,0.4);
-}
-
-.step-content h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-.step-content p { font-size: 14px; color: var(--muted); line-height: 1.7; }
-.step-content code {
-  display: inline-block;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: var(--accent2);
-  margin-top: 8px;
-}
-
-/* ── FOOTER ── */
-footer {
-  position: relative;
-  z-index: 1;
-  border-top: 1px solid var(--border);
-  padding: 48px 40px;
-  text-align: center;
-}
-
-.footer-logo {
-  font-family: 'Orbitron', monospace;
-  font-size: 24px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-}
-
-.footer-desc { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-
-.footer-links { display: flex; gap: 24px; justify-content: center; margin-bottom: 32px; }
-.footer-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.3s; }
-.footer-links a:hover { color: var(--accent); }
-
-.footer-copy { font-size: 12px; color: #334155; font-family: 'Space Mono', monospace; }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  nav { padding: 14px 20px; }
-  .nav-links { gap: 16px; }
-  .nav-links a:not(.lang-btn) { display: none; }
-  #hero { padding: 100px 20px 60px; }
-  .hero-stats { gap: 24px; }
-  .specs-container { grid-template-columns: 1fr; }
-  .download-card { padding: 40px 24px; }
-  .mockup-sidebar { display: none; }
-  .step { flex-direction: column; gap: 12px; }
-  .mockup-cards { grid-template-columns: 1fr 1fr; }
-}
-
-/* ── LANG SWITCH ── */
-.ar { display: block; }
-.en { display: none; }
-body.lang-en .ar { display: none; }
-body.lang-en .en { display: block; }
-body.lang-en { direction: ltr; font-family: 'Space Mono', monospace; }
-body.lang-en .feature-title-ar { font-family: 'Space Mono', monospace; font-size: 15px; }
+#home::before { content:''; position:absolute; width:400px; height:400px; background:rgba(255,255,255,0.04); border-radius:50%; top:-100px; left:-100px; }
+#home::after { content:''; position:absolute; width:300px; height:300px; background:rgba(255,255,255,0.03); border-radius:50%; bottom:-80px; right:-80px; }
+.hero-inner { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-badge { display:inline-block; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:4px 14px; border-radius:20px; font-size:13px; margin-bottom:20px; }
+.hero-title { font-size: clamp(28px,5vw,46px); font-weight:800; line-height:1.2; margin-bottom:16px; letter-spacing:-0.5px; }
+.hero-title em { font-style:normal; color:#93c5fd; }
+.hero-sub { font-size:17px; color:rgba(255,255,255,0.82); margin-bottom:32px; }
+.hero-stats { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+.stat-item { text-align:center; }
+.stat-num { font-size:32px; font-weight:800; color:white; display:block; line-height:1; }
+.stat-lbl { font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px; }
+.hero-btn { display:inline-block; background:white; color:var(--blue-deep); padding:13px 32px; border-radius:8px; font-size:15px; font-weight:700; text-decoration:none; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+.hero-btn:hover { transform: translateY(-2px); }
+.section { padding: 56px 2rem; max-width: 1100px; margin: 0 auto; }
+.steps-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-top:24px; }
+.step-card { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius); padding:22px; text-align:center; }
+.step-num { width:36px; height:36px; background:var(--blue-pale); color:var(--blue-mid); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; margin:0 auto 12px; }
+.step-card h3 { font-size:15px; color:var(--blue-deep); margin-bottom:6px; }
+.step-card p { font-size:13.5px; color:var(--gray-600); }
+.cats-preview { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:24px; }
+.cat-box { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius); padding:18px; text-align:center; text-decoration:none; color:var(--gray-800); transition:all .15s; }
+.cat-box:hover { border-color:var(--blue-mid); background:var(--blue-pale); }
+.cat-box .emoji { font-size:24px; display:block; margin-bottom:8px; }
+.cat-box span.lbl { font-size:13px; font-weight:600; }
+.blog-teaser { background: var(--white); border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); padding:56px 2rem; }
+.blog-teaser-inner { max-width:1100px; margin:0 auto; }
+.mini-blog-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-top:24px; }
+.mini-card { border:1.5px solid var(--gray-200); border-radius:var(--radius); padding:18px; text-decoration:none; color:var(--gray-800); display:block; transition:all .15s; }
+.mini-card:hover { border-color:var(--blue-mid); box-shadow:var(--shadow-md); }
+.mini-card .tag { font-size:11px; color:var(--blue-mid); font-weight:600; }
+.mini-card h3 { font-size:15px; color:var(--blue-deep); margin:6px 0; }
+.mini-card p { font-size:13px; color:var(--gray-600); }
 </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
-<!-- NAVBAR -->
 <nav>
-  <div class="nav-logo">SDTORA PRO</div>
-  <div class="nav-links">
-    <a href="#features"><span class="ar">المميزات</span><span class="en">Features</span></a>
-    <a href="#specs"><span class="ar">المواصفات</span><span class="en">Specs</span></a>
-    <a href="#howto"><span class="ar">طريقة التثبيت</span><span class="en">How To</span></a>
-    <a href="#download"><span class="ar">تحميل</span><span class="en">Download</span></a>
-    <button class="lang-btn" onclick="toggleLang()">EN / AR</button>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">📚 <span>Prompt</span>Academy</a>
+    <div class="nav-links">
+      <a href="index.html" class="active">الرئيسية</a>
+      <a href="library.html">المكتبة</a>
+      <a href="blog/index.html">المدونة</a>
+      <a href="about.html">حول الموقع</a>
+      <a href="contact.html">تواصل معنا</a>
+    </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-badge">
-    <span class="ar">✦ الإصدار 1.0.0 متاح الآن</span>
-    <span class="en">✦ VERSION 1.0.0 — NOW AVAILABLE</span>
-  </div>
-
-  <h1 class="hero-title">
-    <span class="gradient-text">SDTORA</span><br>
-    <span style="font-size:0.6em; color: var(--text);">PRO</span>
-  </h1>
-
-  <p class="hero-subtitle-ar ar">المتجر الرقمي وإدارة المحفظة الإلكترونية</p>
-  <p class="hero-subtitle-en en">DIGITAL STORE & WALLET MANAGEMENT</p>
-  <p class="hero-subtitle-en ar" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:13px;">DIGITAL STORE & WALLET MANAGEMENT</p>
-
-  <p class="hero-desc">
-    <span class="ar">برنامج سطح مكتب احترافي يجمع بين متجر رقمي متكامل ومحفظة SDTORA الإلكترونية — مع لوحة تحكم للمدير وتكامل مباشر مع Firebase</span>
-    <span class="en">A professional desktop application combining a full digital store with SDTORA wallet management — with admin dashboard and direct Firebase integration.</span>
-  </p>
-
-  <div class="hero-btns">
-    <a href="#download" class="btn-primary">
-      ⬇️ <span class="ar">تحميل مجاناً</span><span class="en">Download Free</span>
-    </a>
-    <a href="#features" class="btn-secondary">
-      <span class="ar">اكتشف المميزات</span><span class="en">Explore Features</span> →
-    </a>
-  </div>
-
-  <div class="hero-stats">
-    <div class="stat-item">
-      <div class="stat-num">68</div>
-      <div class="stat-label ar">ملف مصدري</div>
-      <div class="stat-label en">Source Files</div>
+<section id="home">
+  <div class="hero-inner">
+    <div class="hero-badge">🎓 مكتبة البحث الأكاديمي</div>
+    <h1 class="hero-title">برومتات <em>احترافية</em> لكتابة بحثك الأكاديمي</h1>
+    <p class="hero-sub">أكثر من 65 برومت جاهز للاستخدام في ChatGPT — موزعة على 10 أقسام تغطي كل مراحل الكتابة الأكاديمية. اختر، اعاين، انسخ.</p>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-num">65+</span><div class="stat-lbl">برومت جاهز</div></div>
+      <div class="stat-item"><span class="stat-num">10</span><div class="stat-lbl">قسم أكاديمي</div></div>
+      <div class="stat-item"><span class="stat-num">2</span><div class="stat-lbl">لغة (عربي / إنجليزي)</div></div>
     </div>
-    <div class="stat-item">
-      <div class="stat-num">5.4K</div>
-      <div class="stat-label ar">سطر كود</div>
-      <div class="stat-label en">Lines of Code</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">13</div>
-      <div class="stat-label ar">شاشة كاملة</div>
-      <div class="stat-label en">Full Screens</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">8</div>
-      <div class="stat-label ar">خدمة Firebase</div>
-      <div class="stat-label en">Firebase Services</div>
-    </div>
+    <a href="library.html" class="hero-btn">ابدأ الاستخدام ←</a>
   </div>
 </section>
 
-<!-- MOCKUP -->
-<div class="mockup-container reveal">
-  <div class="mockup-window">
-    <div class="mockup-bar">
-      <div class="mockup-dots">
-        <div class="mockup-dot dot-r"></div>
-        <div class="mockup-dot dot-y"></div>
-        <div class="mockup-dot dot-g"></div>
-      </div>
-      <div class="mockup-title">SDTORA PRO — المحفظة</div>
-    </div>
-    <div class="mockup-body">
-      <div class="mockup-content">
-        <div class="mockup-header">
-          <div class="mockup-page-title">💰 محفظتي</div>
-          <div class="mockup-balance">1,247.50 SDTORA</div>
-        </div>
-        <div class="mockup-cards">
-          <div class="mockup-card">
-            <div class="mockup-card-icon">🛍️</div>
-            <div class="mockup-card-name">متجر الكتب</div>
-            <div class="mockup-card-price">45.00 SDT</div>
-          </div>
-          <div class="mockup-card">
-            <div class="mockup-card-icon">💻</div>
-            <div class="mockup-card-name">إلكترونيات</div>
-            <div class="mockup-card-price">299.99 SDT</div>
-          </div>
-          <div class="mockup-card">
-            <div class="mockup-card-icon">👗</div>
-            <div class="mockup-card-name">ملابس</div>
-            <div class="mockup-card-price">89.00 SDT</div>
-          </div>
-        </div>
-        <div class="mockup-table">
-          <div class="mockup-table-row header">
-            <span class="tx-type">النوع</span>
-            <span class="tx-amount">المبلغ</span>
-            <span class="tx-desc">الوصف</span>
-            <span class="tx-status">الحالة</span>
-          </div>
-          <div class="mockup-table-row">
-            <span class="tx-type">📥 استلام</span>
-            <span class="tx-amount tx-recv">+500.00</span>
-            <span class="tx-desc">رصيد ترحيبي</span>
-            <span class="tx-status">✅ مكتمل</span>
-          </div>
-          <div class="mockup-table-row">
-            <span class="tx-type">🛒 شراء</span>
-            <span class="tx-amount tx-send">-45.00</span>
-            <span class="tx-desc">شراء كتاب برمجة</span>
-            <span class="tx-status">✅ مكتمل</span>
-          </div>
-          <div class="mockup-table-row">
-            <span class="tx-type">📤 إرسال</span>
-            <span class="tx-amount tx-send">-100.10</span>
-            <span class="tx-desc">تحويل لصديق</span>
-            <span class="tx-status">✅ مكتمل</span>
-          </div>
-        </div>
-      </div>
-      <div class="mockup-sidebar">
-        <div class="sidebar-logo">💎 SDTORA</div>
-        <div class="sidebar-item">🏪 <span>المتجر</span></div>
-        <div class="sidebar-item active">💰 <span>المحفظة</span></div>
-        <div class="sidebar-item">📦 <span>طلباتي</span></div>
-        <div class="sidebar-item">📤 <span>إرسال</span></div>
-        <div class="sidebar-item">❤️ <span>المفضلة</span></div>
-        <div class="sidebar-item">💬 <span>المحادثة</span></div>
-        <div class="sidebar-item">🎫 <span>الدعم</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="section-header reveal">
-    <div class="section-tag ar">المميزات</div>
-    <div class="section-tag en">FEATURES</div>
-    <h2 class="section-title">
-      <span class="ar">كل ما تحتاجه في برنامج واحد</span>
-      <span class="en">Everything You Need in One App</span>
-    </h2>
-    <p class="section-desc ar">من إدارة المتجر إلى المحفظة الرقمية — تجربة متكاملة مبنية بـ C++ وQt</p>
-    <p class="section-desc en">From store management to digital wallet — a complete experience built with C++ and Qt</p>
-  </div>
-
-  <div class="features-grid">
-    <div class="feature-card reveal">
-      <div class="feature-icon">🏪</div>
-      <div class="feature-title-ar ar">متجر رقمي متكامل</div>
-      <div class="feature-title-ar en">Digital Store</div>
-      <div class="feature-title-en">DIGITAL STORE</div>
-      <p class="feature-desc ar">تصفح المنتجات مع فلاتر متقدمة، بحث ذكي، سلة شراء، وعروض خاصة. دعم كامل للصور وتصنيفات متعددة.</p>
-      <p class="feature-desc en">Browse products with advanced filters, smart search, shopping cart, and special offers. Full image support and multiple categories.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">💰</div>
-      <div class="feature-title-ar ar">محفظة SDTORA</div>
-      <div class="feature-title-ar en">SDTORA Wallet</div>
-      <div class="feature-title-en">SDTORA WALLET</div>
-      <p class="feature-desc ar">إدارة رصيدك بسهولة، إرسال واستقبال SDTORA لأي محفظة، سجل معاملات كامل، ورسوم شفافة.</p>
-      <p class="feature-desc en">Manage your balance easily, send and receive SDTORA to any wallet, complete transaction history, and transparent fees.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">📦</div>
-      <div class="feature-title-ar ar">تتبع الطلبات</div>
-      <div class="feature-title-ar en">Order Tracking</div>
-      <div class="feature-title-en">ORDER TRACKING</div>
-      <p class="feature-desc ar">تابع طلباتك خطوة بخطوة من لحظة الطلب حتى التسليم مع تحديثات فورية من الإدارة.</p>
-      <p class="feature-desc en">Track your orders step by step from the moment of purchase to delivery with real-time admin updates.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">⭐</div>
-      <div class="feature-title-ar ar">نقاط الولاء</div>
-      <div class="feature-title-ar en">Loyalty Points</div>
-      <div class="feature-title-en">LOYALTY POINTS</div>
-      <p class="feature-desc ar">اكسب نقاط مع كل عملية شراء واستبدلها برصيد SDTORA. كل 100 نقطة = 10 SDTORA.</p>
-      <p class="feature-desc en">Earn points with every purchase and redeem them for SDTORA balance. Every 100 points = 10 SDTORA.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">🏷️</div>
-      <div class="feature-title-ar ar">كوبونات الخصم</div>
-      <div class="feature-title-ar en">Discount Coupons</div>
-      <div class="feature-title-en">DISCOUNT COUPONS</div>
-      <p class="feature-desc ar">أكواد خصم بنسبة مئوية أو مبلغ ثابت، مع إمكانية التحقق الفوري وحد أقصى للاستخدام.</p>
-      <p class="feature-desc en">Percentage or fixed discount codes, with instant validation and maximum usage limits.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">💬</div>
-      <div class="feature-title-ar ar">دعم فوري</div>
-      <div class="feature-title-ar en">Live Support</div>
-      <div class="feature-title-en">LIVE SUPPORT</div>
-      <p class="feature-desc ar">تواصل مباشرة مع فريق SDTORA عبر نظام محادثة مدمج مع تحديث تلقائي للرسائل.</p>
-      <p class="feature-desc en">Chat directly with the SDTORA team through a built-in messaging system with automatic message updates.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">⚙️</div>
-      <div class="feature-title-ar ar">لوحة تحكم الأدمن</div>
-      <div class="feature-title-ar en">Admin Dashboard</div>
-      <div class="feature-title-en">ADMIN DASHBOARD</div>
-      <p class="feature-desc ar">إدارة كاملة للمنتجات، الطلبات، المستخدمين، الكوبونات، والمحادثات — كل شيء في مكان واحد.</p>
-      <p class="feature-desc en">Full management of products, orders, users, coupons, and chats — everything in one place.</p>
-    </div>
-
-    <div class="feature-card reveal">
-      <div class="feature-icon">🔥</div>
-      <div class="feature-title-ar ar">Firebase مدمج</div>
-      <div class="feature-title-ar en">Firebase Integration</div>
-      <div class="feature-title-en">FIREBASE INTEGRATION</div>
-      <p class="feature-desc ar">تكامل مباشر مع Firebase Firestore عبر REST API — بيانات حقيقية، مزامنة فورية، وأمان عالي.</p>
-      <p class="feature-desc en">Direct integration with Firebase Firestore via REST API — real data, instant sync, and high security.</p>
-    </div>
-  </div>
-</section>
-
-<!-- SPECS -->
-<section id="specs">
-  <div class="section-header reveal">
-    <div class="section-tag ar">المواصفات التقنية</div>
-    <div class="section-tag en">TECHNICAL SPECS</div>
-    <h2 class="section-title">
-      <span class="ar">مبني بأحدث التقنيات</span>
-      <span class="en">Built With Modern Tech</span>
-    </h2>
-  </div>
-
-  <div class="specs-container reveal">
-    <div class="spec-group">
-      <h3 class="ar">تفاصيل البرنامج</h3>
-      <h3 class="en">Application Details</h3>
-      <div class="spec-item">
-        <span class="spec-key ar">الإصدار</span>
-        <span class="spec-key en">Version</span>
-        <span class="spec-val blue">1.0.0</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">لغة البرمجة</span>
-        <span class="spec-key en">Language</span>
-        <span class="spec-val">C++17</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">الواجهة الرسومية</span>
-        <span class="spec-key en">GUI Framework</span>
-        <span class="spec-val">Qt 6.7 Widgets</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">قاعدة البيانات</span>
-        <span class="spec-key en">Database</span>
-        <span class="spec-val">Firebase Firestore</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">الاتصال</span>
-        <span class="spec-key en">Networking</span>
-        <span class="spec-val">libcurl + REST API</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">عدد الملفات</span>
-        <span class="spec-key en">Source Files</span>
-        <span class="spec-val green">68 ملف</span>
-      </div>
-    </div>
-
-    <div class="spec-group">
-      <h3 class="ar">متطلبات التشغيل</h3>
-      <h3 class="en">System Requirements</h3>
-      <div class="spec-item">
-        <span class="spec-key ar">نظام التشغيل</span>
-        <span class="spec-key en">OS</span>
-        <span class="spec-val">Windows 10/11 (64-bit)</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">المعالج</span>
-        <span class="spec-key en">CPU</span>
-        <span class="spec-val">x64 — أي معالج حديث</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">الذاكرة</span>
-        <span class="spec-key en">RAM</span>
-        <span class="spec-val green">256 MB+</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">مساحة القرص</span>
-        <span class="spec-key en">Storage</span>
-        <span class="spec-val">~100 MB</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">الإنترنت</span>
-        <span class="spec-key en">Internet</span>
-        <span class="spec-val blue">مطلوب (Firebase)</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-key ar">التثبيت</span>
-        <span class="spec-key en">Installation</span>
-        <span class="spec-val green">لا يحتاج تثبيت ✓</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW TO -->
-<section id="howto">
-  <div class="section-header reveal">
-    <div class="section-tag ar">طريقة التشغيل</div>
-    <div class="section-tag en">HOW TO USE</div>
-    <h2 class="section-title">
-      <span class="ar">ابدأ في 3 خطوات</span>
-      <span class="en">Get Started in 3 Steps</span>
-    </h2>
-  </div>
-
-  <div class="steps-container">
-    <div class="step reveal">
+<section class="section">
+  <h2 class="section-title">كيف يعمل الموقع؟</h2>
+  <p class="section-sub">ثلاث خطوات بسيطة فقط للحصول على برومت جاهز لبحثك</p>
+  <div class="steps-grid">
+    <div class="step-card">
       <div class="step-num">1</div>
-      <div class="step-content">
-        <h3 class="ar">حمّل البرنامج</h3>
-        <h3 class="en">Download the App</h3>
-        <p class="ar">اضغط على زر التحميل أدناه واحفظ الملف المضغوط على جهازك</p>
-        <p class="en">Click the download button below and save the ZIP file to your device.</p>
-      </div>
+      <h3>اختر القسم</h3>
+      <p>حدد مرحلة البحث التي تعمل عليها — من الموضوع وحتى الاستنتاجات.</p>
     </div>
-
-    <div class="step reveal">
+    <div class="step-card">
       <div class="step-num">2</div>
-      <div class="step-content">
-        <h3 class="ar">فك الضغط</h3>
-        <h3 class="en">Extract Files</h3>
-        <p class="ar">فك ضغط الملف في أي مجلد تريده على جهازك — البرنامج لا يحتاج تثبيت</p>
-        <p class="en">Extract the ZIP file to any folder on your device — no installation required.</p>
-        <code>Right Click → Extract All</code>
-      </div>
+      <h3>اعاين البرومت</h3>
+      <p>اقرأ البرومت بالعربي أو الإنجليزي أو كليهما معاً قبل الاستخدام.</p>
     </div>
-
-    <div class="step reveal">
+    <div class="step-card">
       <div class="step-num">3</div>
-      <div class="step-content">
-        <h3 class="ar">شغّل البرنامج</h3>
-        <h3 class="en">Run the App</h3>
-        <p class="ar">انقر نقراً مزدوجاً على الملف لتشغيل البرنامج وإنشاء حسابك مجاناً</p>
-        <p class="en">Double-click the file to launch the app and create your free account.</p>
-        <code>SdtoraPro.exe</code>
-      </div>
+      <h3>انسخ واستخدم</h3>
+      <p>اضغط زر النسخ، الصقه في ChatGPT، وعدّل الأقواس [ ] بمعلومات بحثك.</p>
     </div>
   </div>
 </section>
 
-<!-- DOWNLOAD -->
-<section id="download">
-  <div class="download-card reveal">
-    <div class="download-glow"></div>
-    <div class="download-icon">💎</div>
-    <h2 class="download-title ar">حمّل SDTORA PRO</h2>
-    <h2 class="download-title en">Download SDTORA PRO</h2>
-    <p class="download-subtitle ar">مجاني تماماً — بدون تثبيت — يعمل فوراً</p>
-    <p class="download-subtitle en">Completely Free — No Installation — Works Instantly</p>
-    <div class="download-version">v1.0.0 — Windows 64-bit</div>
+<section class="section">
+  <h2 class="section-title">تصفح حسب مرحلة البحث</h2>
+  <p class="section-sub">كل قسم يحتوي على برومتات متخصصة لتلك المرحلة بالتحديد</p>
+  <div class="cats-preview">
+    <a href="library.html#topic" class="cat-box"><span class="emoji">📌</span><span class="lbl">الموضوع</span></a>
+    <a href="library.html#title" class="cat-box"><span class="emoji">🏷️</span><span class="lbl">العنوان</span></a>
+    <a href="library.html#abstract" class="cat-box"><span class="emoji">📄</span><span class="lbl">الخلاصة</span></a>
+    <a href="library.html#keywords" class="cat-box"><span class="emoji">🔑</span><span class="lbl">الكلمات المفتاحية</span></a>
+    <a href="library.html#intro" class="cat-box"><span class="emoji">🚪</span><span class="lbl">المقدمة</span></a>
+    <a href="library.html#litreview" class="cat-box"><span class="emoji">📚</span><span class="lbl">مراجعة الأدبيات</span></a>
+    <a href="library.html#methodology" class="cat-box"><span class="emoji">⚙️</span><span class="lbl">المنهجية</span></a>
+    <a href="library.html#results" class="cat-box"><span class="emoji">📊</span><span class="lbl">النتائج</span></a>
+    <a href="library.html#discussion" class="cat-box"><span class="emoji">💬</span><span class="lbl">المناقشة</span></a>
+    <a href="library.html#conclusions" class="cat-box"><span class="emoji">✅</span><span class="lbl">الاستنتاجات</span></a>
+  </div>
+</section>
 
-    <a href="https://download1580.mediafire.com/qo6692g0o5ogAGQuG8qUrsRdKVUGy6gE4yrC4BI3rayd0FR5Qa1HXM-Nd1hw80WRZ4GyFpGixcv23RYlcc20pFyddcbFVIwypS0x2s_pvF7duF-ImUZyipig6VIkSOQSSsXZn2dWJ5MQZEH8uAebyFi6Ui8ZeJtC2O4mPLzObWg/vrccgcen4lcybj5/x64-Debug.rar" class="btn-primary" style="font-size:18px; padding:20px 48px;">
-      ⬇️ <span class="ar">تحميل مجاناً</span><span class="en">Free Download</span>
-    </a>
-
-    <div class="download-info">
-      <div class="dl-info-item">
-        <div class="dl-info-val">~70 MB</div>
-        <div class="dl-info-key ar">حجم الملف</div>
-        <div class="dl-info-key en">File Size</div>
-      </div>
-      <div class="dl-info-item">
-        <div class="dl-info-val">Windows</div>
-        <div class="dl-info-key ar">نظام التشغيل</div>
-        <div class="dl-info-key en">Platform</div>
-      </div>
-      <div class="dl-info-item">
-        <div class="dl-info-val">مجاني</div>
-        <div class="dl-info-key ar">السعر</div>
-        <div class="dl-info-key en">Price</div>
-      </div>
-      <div class="dl-info-item">
-        <div class="dl-info-val">v1.0.0</div>
-        <div class="dl-info-key ar">الإصدار</div>
-        <div class="dl-info-key en">Version</div>
-      </div>
+<section class="blog-teaser">
+  <div class="blog-teaser-inner">
+    <h2 class="section-title">من المدونة</h2>
+    <p class="section-sub">مقالات تساعدك على فهم كيفية استخدام الذكاء الاصطناعي في بحثك الأكاديمي بفعالية</p>
+    <div class="mini-blog-grid">
+      <a class="mini-card" href="blog/how-to-use-chatgpt-prompts.html">
+        <span class="tag">دليل</span>
+        <h3>كيف تستخدم برومتات ChatGPT في بحثك الأكاديمي؟</h3>
+        <p>دليل شامل لتوظيف الذكاء الاصطناعي في كل مراحل كتابة البحث العلمي.</p>
+      </a>
+      <a class="mini-card" href="blog/writing-strong-research-introduction.html">
+        <span class="tag">كتابة</span>
+        <h3>كيف تكتب مقدمة بحثية قوية بمساعدة الذكاء الاصطناعي؟</h3>
+        <p>أسرار صياغة مقدمة أكاديمية تجذب القارئ وتوضح أهمية بحثك.</p>
+      </a>
+      <a class="mini-card" href="blog/literature-review-tips.html">
+        <span class="tag">مراجعة الأدبيات</span>
+        <h3>5 نصائح لكتابة مراجعة أدبيات متميزة</h3>
+        <p>كيف تنظم وتحلل الدراسات السابقة بطريقة منهجية واحترافية.</p>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">SDTORA PRO</div>
-  <p class="footer-desc ar">المتجر الرقمي وإدارة المحفظة الإلكترونية</p>
-  <p class="footer-desc en">Digital Store & Wallet Management</p>
+  <p>صُنع بـ ❤️ لمساعدة الباحثين العرب | <strong>PromptAcademy</strong> &copy; 2025</p>
   <div class="footer-links">
-    <a href="#features"><span class="ar">المميزات</span><span class="en">Features</span></a>
-    <a href="#specs"><span class="ar">المواصفات</span><span class="en">Specs</span></a>
-    <a href="#howto"><span class="ar">طريقة التشغيل</span><span class="en">How To</span></a>
-    <a href="#download"><span class="ar">تحميل</span><span class="en">Download</span></a>
+    <a href="about.html">حول الموقع</a>
+    <a href="contact.html">تواصل معنا</a>
+    <a href="privacy.html">سياسة الخصوصية</a>
+    <a href="terms.html">شروط الاستخدام</a>
+    <a href="blog/index.html">المدونة</a>
   </div>
-  <p class="footer-copy">© 2026 SDTORA PRO — All Rights Reserved</p>
 </footer>
 
-<script>
-// Language toggle
-function toggleLang() {
-  document.body.classList.toggle('lang-en');
-  const isEn = document.body.classList.contains('lang-en');
-  document.documentElement.lang = isEn ? 'en' : 'ar';
-  document.documentElement.dir = isEn ? 'ltr' : 'rtl';
-}
-
-// Scroll reveal
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry, i) => {
-    if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('visible'), i * 80);
-    }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// Smooth nav highlight
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('nav');
-  nav.style.background = window.scrollY > 50
-    ? 'rgba(2,8,23,0.95)'
-    : 'rgba(2,8,23,0.8)';
-});
-
-// Animated counter
-function animateCounter(el, target, duration = 2000) {
-  let start = 0;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    start += step;
-    if (start >= target) { el.textContent = target; clearInterval(timer); return; }
-    el.textContent = Math.floor(start);
-  }, 16);
-}
-</script>
 </body>
 </html>
