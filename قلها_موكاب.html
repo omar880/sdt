@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قلها — الجزائر تسمعك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Tajawal:wght@400;500;700&family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF2E9;
+    --surface:#FFFFFF;
+    --surface-warm:#FFFBF6;
+    --ink:#2A1F17;
+    --ink-soft:#6B5D4F;
+    --ink-faint:#A6968400;
+    --border:#EADFC9;
+    --coral:#D85A30;
+    --coral-dark:#A8431F;
+    --coral-light:#F0997B;
+    --coral-tint:#FAECE7;
+    --gold:#FAC775;
+    --gold-dark:#7A5210;
+    --gold-tint:#FDF3DF;
+    --green:#4A7A4E;
+    --green-tint:#E9F2E7;
+    --blue:#3C6E93;
+    --blue-tint:#E8F1F6;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:8px;
+    --shadow-card:0 1px 2px rgba(42,31,23,0.04), 0 8px 24px -12px rgba(42,31,23,0.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Tajawal', sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3,.display{
+    font-family:'Cairo', sans-serif;
+    font-weight:800;
+    color:var(--ink);
+  }
+  .num{ font-family:'Inter', sans-serif; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; background:none; }
+  img,svg{ display:block; }
+  :focus-visible{ outline:2px solid var(--coral); outline-offset:2px; }
+
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 24px; }
+
+  /* ===== Header ===== */
+  header{
+    position:sticky; top:0; z-index:40;
+    background:rgba(251,242,233,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  .header-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 0;
+  }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:38px; height:38px; border-radius:11px;
+    background:var(--coral);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .logo-text{ display:flex; flex-direction:column; line-height:1.15; }
+  .logo-text b{ font-family:'Cairo',sans-serif; font-weight:900; font-size:21px; }
+  .logo-text span{ font-size:11px; color:var(--ink-soft); font-weight:500; }
+  nav{ display:flex; align-items:center; gap:30px; }
+  nav a{ font-size:15px; font-weight:700; color:var(--ink-soft); transition:color .15s; }
+  nav a:hover, nav a.active{ color:var(--coral-dark); }
+  .header-actions{ display:flex; align-items:center; gap:10px; }
+  .btn{
+    padding:10px 20px; border-radius:999px; font-size:14px; font-weight:700;
+    transition:transform .12s, box-shadow .12s, background .15s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:var(--coral); color:#fff; }
+  .btn-primary:hover{ background:var(--coral-dark); }
+  .btn-ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--border); }
+  .btn-ghost:hover{ border-color:var(--coral-light); }
+  .btn-sm{ padding:7px 14px; font-size:13px; }
+  @media (max-width:860px){ nav{ display:none; } }
+
+  /* ===== Hero ===== */
+  .hero{ padding:64px 0 40px; text-align:center; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--coral-tint); color:var(--coral-dark);
+    padding:7px 16px; border-radius:999px; font-size:13px; font-weight:700;
+    margin-bottom:22px;
+  }
+  .hero h1{ font-size:56px; line-height:1.08; margin-bottom:18px; }
+  .hero h1 em{ font-style:normal; color:var(--coral); }
+  .hero p{ font-size:18px; color:var(--ink-soft); max-width:560px; margin:0 auto 30px; font-weight:400; }
+  .hero-actions{ display:flex; gap:12px; justify-content:center; margin-bottom:46px; }
+  .hero-actions .btn{ padding:14px 26px; font-size:15px; }
+  @media (max-width:640px){ .hero h1{ font-size:38px; } }
+
+  .stat-strip{
+    display:flex; justify-content:center; gap:0;
+    max-width:640px; margin:0 auto;
+    border:1px solid var(--border); border-radius:var(--radius-md);
+    background:var(--surface); overflow:hidden;
+  }
+  .stat{ flex:1; padding:20px 12px; text-align:center; border-inline-start:1px solid var(--border); }
+  .stat:first-child{ border-inline-start:none; }
+  .stat b{ font-family:'Cairo',sans-serif; font-size:26px; display:block; color:var(--coral-dark); }
+  .stat span{ font-size:12.5px; color:var(--ink-soft); font-weight:500; }
+
+  /* ===== Filter chips ===== */
+  .chips{
+    display:flex; gap:9px; overflow-x:auto; padding:26px 0 8px;
+    scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0; padding:9px 18px; border-radius:999px; font-size:13.5px; font-weight:700;
+    background:var(--surface); border:1.5px solid var(--border); color:var(--ink-soft);
+    transition:all .15s;
+  }
+  .chip.active{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .chip:hover:not(.active){ border-color:var(--coral-light); color:var(--coral-dark); }
+
+  /* ===== Layout ===== */
+  main{ padding:20px 0 70px; }
+  .layout{ display:grid; grid-template-columns:1fr 340px; gap:32px; align-items:start; }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } }
+
+  .section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .section-head h2{ font-size:19px; }
+  .sort-toggle{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:3px; }
+  .sort-toggle button{ padding:6px 14px; font-size:12.5px; font-weight:700; border-radius:999px; color:var(--ink-soft); }
+  .sort-toggle button.active{ background:var(--gold-tint); color:var(--gold-dark); }
+
+  .feed{ display:flex; flex-direction:column; gap:16px; }
+
+  /* ===== Discussion card ===== */
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+    box-shadow:var(--shadow-card);
+    padding:20px;
+  }
+  .card-top{ display:flex; align-items:flex-start; gap:14px; }
+  .vote-box{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    flex-shrink:0; width:48px; padding-top:2px;
+  }
+  .vote-btn{
+    width:36px; height:36px; border-radius:var(--radius-sm);
+    border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center;
+    transition:all .15s;
+  }
+  .vote-btn:hover{ border-color:var(--coral); background:var(--coral-tint); }
+  .vote-count{ font-family:'Inter',sans-serif; font-weight:600; font-size:14px; }
+
+  .card-body{ flex:1; min-width:0; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:9px; }
+  .tag{
+    font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:6px;
+  }
+  .tag-sector{ background:var(--blue-tint); color:var(--blue); }
+  .tag-wilaya{ background:var(--bg); color:var(--ink-soft); border:1px solid var(--border); }
+  .tag-open{ background:var(--gold-tint); color:var(--gold-dark); }
+  .tag-solution{ background:var(--green-tint); color:var(--green); }
+
+  .card-body h3{ font-size:16.5px; font-weight:700; font-family:'Tajawal',sans-serif; margin-bottom:8px; line-height:1.5; }
+  .meta-row{ display:flex; align-items:center; gap:16px; font-size:12.5px; color:var(--ink-soft); margin-top:10px; }
+  .meta-row .meta-item{ display:flex; align-items:center; gap:5px; }
+
+  /* ===== Project card (signature element) ===== */
+  .project-card{ border-color:var(--coral-light); }
+  .flow{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--border); border:1px solid var(--border); border-radius:var(--radius-sm);
+    overflow:hidden; margin:14px 0 12px;
+  }
+  .flow-step{ background:var(--surface-warm); padding:12px 10px; }
+  .flow-step.problem{ background:var(--coral-tint); }
+  .flow-step.solution{ background:var(--gold-tint); }
+  .flow-step .flow-label{ font-size:10.5px; font-weight:700; color:var(--ink-soft); margin-bottom:5px; display:block; }
+  .flow-step.problem .flow-label{ color:var(--coral-dark); }
+  .flow-step.solution .flow-label{ color:var(--gold-dark); }
+  .flow-step p{ font-size:12px; line-height:1.55; }
+  @media (max-width:640px){ .flow{ grid-template-columns:1fr 1fr; } }
+
+  .status-pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px; }
+  .status-review{ background:var(--blue-tint); color:var(--blue); }
+  .status-referred{ background:var(--gold-tint); color:var(--gold-dark); }
+  .status-done{ background:var(--green-tint); color:var(--green); }
+
+  /* ===== Sidebar ===== */
+  aside{ display:flex; flex-direction:column; gap:18px; position:sticky; top:90px; }
+  .side-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:18px; box-shadow:var(--shadow-card); }
+  .side-card h3{ font-size:14.5px; margin-bottom:14px; display:flex; align-items:center; gap:7px; }
+
+  .spotlight-title{ font-size:14.5px; font-weight:700; margin-bottom:6px; line-height:1.5; }
+  .spotlight-excerpt{ font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; }
+  .spotlight-author{ font-size:12px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
+  .author-dot{ width:6px; height:6px; border-radius:50%; background:var(--coral); }
+
+  .board-col{ margin-bottom:12px; }
+  .board-col:last-child{ margin-bottom:0; }
+  .board-col-head{ display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+  .board-count{ font-family:'Inter',sans-serif; background:var(--bg); border-radius:999px; padding:1px 8px; font-size:11px; }
+  .board-item{ font-size:12.5px; background:var(--bg); border-radius:var(--radius-sm); padding:9px 11px; line-height:1.5; }
+
+  .diaspora-card{ background:linear-gradient(180deg, var(--surface-warm), var(--surface)); }
+  .diaspora-card p{ font-size:12.5px; color:var(--ink-soft); margin-bottom:12px; }
+
+  .founder-card{ background:var(--ink); color:#fff; }
+  .founder-card h3{ color:var(--gold); }
+  .founder-card p{ font-size:12.5px; color:#D9CFC3; margin-bottom:12px; }
+  .founder-card .btn-primary{ background:var(--gold); color:var(--ink); width:100%; justify-content:center; }
+  .founder-card .btn-primary:hover{ background:#F4B958; }
+
+  /* ===== Footer ===== */
+  footer{ border-top:1px solid var(--border); padding:36px 0; }
+  .footer-inner{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
+  .footer-links{ display:flex; gap:22px; flex-wrap:wrap; }
+  .footer-links a{ font-size:13px; color:var(--ink-soft); font-weight:500; }
+  .footer-links a:hover{ color:var(--coral-dark); }
+  .footer-note{ font-size:12px; color:var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5C4 3.9 4.9 3 6 3H18C19.1 3 20 3.9 20 5V14C20 15.1 19.1 16 18 16H9L5 20V16H6C4.9 16 4 15.1 4 14V5Z" fill="white"/></svg>
+      </div>
+      <div class="logo-text">
+        <b>قلها</b>
+        <span>الجزائر تسمعك</span>
+      </div>
+    </div>
+    <nav>
+      <a href="#" class="active">نقاش</a>
+      <a href="#">مقالات</a>
+      <a href="#">لوحة الشفافية</a>
+      <a href="#">عن المنصة</a>
+    </nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm">تسجيل دخول</button>
+      <button class="btn btn-primary btn-sm">اطرح فكرتك</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">منصة مستقلة تمامًا، بلا حكومة وبلا إعلانات</span>
+    <h1>الجزائر <em>تسمعك</em></h1>
+    <p>قلها مو منصة شكوى، هي منصة حل. اطرح مشكلة، اقترح حل، ولقى ناس يبنيو معاك.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary">اطرح فكرتك الأولى</button>
+      <button class="btn btn-ghost">شوف الأفكار المطروحة</button>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><b class="num">1,240</b><span>فكرة ومقترح</span></div>
+      <div class="stat"><b class="num">48</b><span>ولاية مشاركة</span></div>
+      <div class="stat"><b class="num">37</b><span>فكرة أُحيلت أو أُنجزت</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="chips" id="chips">
+    <button class="chip active">كل الفئات</button>
+    <button class="chip">تعليم</button>
+    <button class="chip">صحة</button>
+    <button class="chip">بيروقراطية وإدارة</button>
+    <button class="chip">بطالة وتشغيل</button>
+    <button class="chip">سكن وعمران</button>
+    <button class="chip">بيئة</button>
+    <button class="chip">اقتصاد ومقاولاتية</button>
+    <button class="chip">شفافية وحوكمة</button>
+    <button class="chip">ثقافة ورياضة</button>
+    <button class="chip">شباب ورقمنة</button>
+  </div>
+
+  <div class="layout">
+    <!-- ===== Feed ===== -->
+    <div>
+      <div class="section-head">
+        <h2>أحدث الأفكار والنقاشات</h2>
+        <div class="sort-toggle">
+          <button class="active">الأحدث</button>
+          <button>الأكثر تصويتًا</button>
+        </div>
+      </div>
+
+      <div class="feed">
+
+        <!-- Project card 1 -->
+        <article class="card project-card">
+          <div class="card-top">
+            <div class="vote-box">
+              <button class="vote-btn" onclick="vote(this)" aria-label="صوّت للفكرة">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4L20 14H4L12 4Z" fill="#D85A30"/></svg>
+              </button>
+              <span class="vote-count num">567</span>
+            </div>
+            <div class="card-body">
+              <div class="tag-row">
+                <span class="tag tag-solution">مشكلة + حل</span>
+                <span class="tag tag-sector">بطالة وتشغيل</span>
+                <span class="tag tag-wilaya">وطني</span>
+              </div>
+              <h3>حاضنة تشغيل لخريجي التكوين المهني</h3>
+
+              <div class="flow">
+                <div class="flow-step problem">
+                  <span class="flow-label">المشكلة</span>
+                  <p>خريجو التكوين المهني ما يلقاوش تربص تطبيقي بعد التخرج</p>
+                </div>
+                <div class="flow-step solution">
+                  <span class="flow-label">الحل المقترح</span>
+                  <p>منصة ربط بين المؤسسات الصغيرة وخريجين جدد لتربصات مدفوعة</p>
+                </div>
+                <div class="flow-step">
+                  <span class="flow-label">الموارد المطلوبة</span>
+                  <p>شراكة مع غرفة الصناعة وتمويل بداية صغير</p>
+                </div>
+                <div class="flow-step">
+                  <span class="flow-label">طريقة التواصل</span>
+                  <p>عبر رسائل المنصة مباشرة</p>
+                </div>
+              </div>
+
+              <div class="meta-row">
+                <span class="status-pill status-referred">أُحيلت لجهة معنية</span>
+                <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11.5C21 16.75 12 21 12 21S3 16.75 3 11.5C3 7.36 6.36 4 10.5 4C11.7 4 12.83 4.35 13.8 4.97" stroke="#6B5D4F" stroke-width="1.6" stroke-linecap="round"/></svg> 89 تعليق</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Discussion card -->
+        <article class="card">
+          <div class="card-top">
+            <div class="vote-box">
+              <button class="vote-btn" onclick="vote(this)" aria-label="صوّت للفكرة">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4L20 14H4L12 4Z" fill="#D85A30"/></svg>
+              </button>
+              <span class="vote-count num">128</span>
+            </div>
+            <div class="card-body">
+              <div class="tag-row">
+                <span class="tag tag-open">نقاش مفتوح</span>
+                <span class="tag tag-sector">شباب ورقمنة</span>
+                <span class="tag tag-wilaya">بومرداس</span>
+              </div>
+              <h3>انقطاع الأنترنت المتكرر في الأحياء الجديدة — شكون عندو نفس المشكل؟</h3>
+              <div class="meta-row">
+                <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11.5C21 16.75 12 21 12 21S3 16.75 3 11.5C3 7.36 6.36 4 10.5 4C11.7 4 12.83 4.35 13.8 4.97" stroke="#6B5D4F" stroke-width="1.6" stroke-linecap="round"/></svg> 47 تعليق</span>
+                <span style="color:var(--coral-dark); font-weight:700;">أضف اقتراح حل →</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project card 2 -->
+        <article class="card project-card">
+          <div class="card-top">
+            <div class="vote-box">
+              <button class="vote-btn" onclick="vote(this)" aria-label="صوّت للفكرة">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4L20 14H4L12 4Z" fill="#D85A30"/></svg>
+              </button>
+              <span class="vote-count num">342</span>
+            </div>
+            <div class="card-body">
+              <div class="tag-row">
+                <span class="tag tag-solution">مشكلة + حل</span>
+                <span class="tag tag-sector">بيروقراطية وإدارة</span>
+                <span class="tag tag-wilaya">قسنطينة</span>
+              </div>
+              <h3>تسريع معاملات البلدية</h3>
+
+              <div class="flow">
+                <div class="flow-step problem">
+                  <span class="flow-label">المشكلة</span>
+                  <p>الانتظار قد يفوق 3 ساعات لاستخراج شهادة ميلاد بسيطة</p>
+                </div>
+                <div class="flow-step solution">
+                  <span class="flow-label">الحل المقترح</span>
+                  <p>حجز موعد إلكتروني وشاشة رقمية تعرض الدور</p>
+                </div>
+                <div class="flow-step">
+                  <span class="flow-label">الموارد المطلوبة</span>
+                  <p>مبرمج ويب وتنسيق مع مصلحة الحالة المدنية</p>
+                </div>
+                <div class="flow-step">
+                  <span class="flow-label">طريقة التواصل</span>
+                  <p>عبر رسائل المنصة مباشرة</p>
+                </div>
+              </div>
+
+              <div class="meta-row">
+                <span class="status-pill status-review">قيد الدراسة</span>
+                <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 11.5C21 16.75 12 21 12 21S3 16.75 3 11.5C3 7.36 6.36 4 10.5 4C11.7 4 12.83 4.35 13.8 4.97" stroke="#6B5D4F" stroke-width="1.6" stroke-linecap="round"/></svg> 56 تعليق</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- ===== Sidebar ===== -->
+    <aside>
+      <div class="side-card">
+        <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L14.4 8.6L21.5 9.2L16 13.6L17.8 20.5L12 16.7L6.2 20.5L8 13.6L2.5 9.2L9.6 8.6L12 2Z" fill="#FAC775"/></svg> فكرة الأسبوع</h3>
+        <div class="spotlight-title">إعادة تأهيل الحدائق العمومية بمشاركة الأحياء</div>
+        <div class="spotlight-excerpt">اقتراح لتبني كل حي حديقته القريبة بدعم بسيط من البلدية بدل انتظار مشروع مركزي...</div>
+        <div class="spotlight-author"><span class="author-dot"></span> بقلم "نسيم_وهراني" · 812 صوت</div>
+      </div>
+
+      <div class="side-card">
+        <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#3C6E93" stroke-width="1.6"/><path d="M9 4V20M15 4V20" stroke="#3C6E93" stroke-width="1.6"/></svg> لوحة الشفافية</h3>
+        <div class="board-col">
+          <div class="board-col-head"><span>قيد الدراسة</span><span class="board-count num">64</span></div>
+          <div class="board-item">تسريع معاملات البلدية</div>
+        </div>
+        <div class="board-col">
+          <div class="board-col-head"><span>أُحيلت لجهة معنية</span><span class="board-count num">21</span></div>
+          <div class="board-item">حاضنة تشغيل لخريجي التكوين المهني</div>
+        </div>
+        <div class="board-col">
+          <div class="board-col-head"><span>منجزة</span><span class="board-count num">37</span></div>
+          <div class="board-item">إنارة الطريق الرئيسي بحي الأمل</div>
+        </div>
+      </div>
+
+      <div class="side-card diaspora-card">
+        <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#D85A30" stroke-width="1.6"/><path d="M3 12H21M12 3C14.5 5.7 15.8 8.7 15.8 12C15.8 15.3 14.5 18.3 12 21C9.5 18.3 8.2 15.3 8.2 12C8.2 8.7 9.5 5.7 12 3Z" stroke="#D85A30" stroke-width="1.6"/></svg> الجالية بالمهجر</h3>
+        <p>عندك وقت أو مهارة تقنية وحاب تساهم من بعيد؟ فرق كتابة، تصميم، وتطوير تنتظرك.</p>
+        <button class="btn btn-ghost btn-sm" style="width:100%; justify-content:center;">شارك من الخارج</button>
+      </div>
+
+      <div class="side-card founder-card">
+        <h3>صوت مؤسس</h3>
+        <p>باقي 500 مكان في الدفعة الأولى من الأصوات المؤسسة. شارة دائمة على البروفايل.</p>
+        <button class="btn btn-primary btn-sm">انضم كصوت مؤسس</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-links">
+      <a href="#">عن المنصة</a>
+      <a href="#">قواعد المجتمع</a>
+      <a href="#">سياسة الخصوصية</a>
+      <a href="#">تقرير الشفافية الشهري</a>
+    </div>
+    <div class="footer-note">قلها منصة مستقلة، غير تابعة لأي جهة حكومية أو حزبية.</div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('chips').addEventListener('click', function(e){
+    var chip = e.target.closest('.chip');
+    if(!chip) return;
+    document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+    chip.classList.add('active');
+  });
+  function vote(btn){
+    var countEl = btn.parentElement.querySelector('.vote-count');
+    var current = parseInt(countEl.textContent.replace(/,/g,''), 10);
+    var voted = btn.getAttribute('data-voted') === '1';
+    if(voted){
+      current -= 1; btn.removeAttribute('data-voted'); btn.style.borderColor = '';
+      btn.style.background = '';
+    } else {
+      current += 1; btn.setAttribute('data-voted','1'); btn.style.borderColor = '#D85A30';
+      btn.style.background = '#FAECE7';
+    }
+    countEl.textContent = current.toLocaleString('en-US');
+  }
+</script>
+
+</body>
+</html>
