@@ -7,7 +7,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>سوق الجملة – كل موردي الجملة في الجزائر</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous"></script>
 <style>
 :root{--bg:#121212;--card:#1c1c1e;--line:#2c2c30;--txt:#f2f2f3;--mut:#a5a5ad;--acc:#4a86f7;--accd:#2f6be0;--wa:#25d366;--wat:#06361a;box-sizing:border-box}
 @media (prefers-color-scheme:light){:root{--bg:#f4f5f7;--card:#fff;--line:#dfe1e6;--txt:#17181a;--mut:#5b5f68;--acc:#2160e8;--accd:#1a4fc2}}
@@ -54,6 +54,8 @@ h2{font-size:20px;margin:30px 0 14px}.mut{color:var(--mut);font-size:13px}.ok{co
 details{margin:6px 0}.dws{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;max-height:200px;overflow:auto;margin-top:8px}
 .dws label{display:flex;gap:6px;align-items:center;color:var(--txt)}.dws input{width:auto;min-height:0}
 #toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;padding:10px 18px;border-radius:10px;z-index:9}
+.vf{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--acc);color:#fff;font-size:10px;vertical-align:middle}
+.chart{display:flex;align-items:flex-end;gap:2px;height:90px;margin-top:8px}.chart i{flex:1;height:100%;position:relative;background:linear-gradient(to top,var(--line) var(--v),transparent 0)}.chart i::after{content:"";position:absolute;bottom:0;left:0;right:0;height:var(--c);background:var(--acc)}
 footer{border-top:1px solid var(--line);margin-top:30px;padding:20px 0;color:var(--mut);font-size:13px;text-align:center}
 @media(max-width:760px){.lay,.pd,.form{grid-template-columns:1fr}.img.big{height:220px}}
 </style>
@@ -79,11 +81,15 @@ const copts=sel=>C.map(c=>`<option value="${c.id}"${sel==c.id?" selected":""}>${
 const norm=p=>{p=String(p).replace(/\D/g,"");return p.startsWith("0")?"213"+p.slice(1):p};
 const ST={pending:"قيد المراجعة",approved:"معتمد",suspended:"موقوف"};
 const img=u=>u&&String(u).startsWith(SB_URL.replace(/\/+$/,"")+"/storage/")?`<img loading="lazy" src="${esc(u)}" alt="">`:"";
-const card=p=>`<div class="card"><a href="#product-${p.id}"><div class="img">${p.image_url?img(p.image_url):"📦"}</div></a><div class="cb"><h3>${esc(p.name)}</h3><span class="price">${fm(p.carton_price)} <span class="mut">/ كرتونة</span></span><span class="mut">القطعة: ${fm(p.unit_price)} · الحد الأدنى: ${p.min_qty_cartons}</span><a class="mut" href="#store-${p.store_id}">${esc(p.store_name)} – ${wnh(p.store_wilaya_id)}</a></div></div>`;
-const storeCard=s=>`<a class="store" href="#store-${s.id}"><div class="av">${s.logo_url?img(s.logo_url):"🏬"}</div><div><b>${esc(s.name)}</b><div class="mut">${wnh(s.wilaya_id)}</div></div></a>`;
-async function up(bucket,file){const EX={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[file.type];if(!EX||file.size>3e6)throw new Error("الصور (JPG/PNG/WebP) فقط وبحجم أقل من 3 ميغا");
- const path=`${me.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${EX}`;
- const {error}=await db.storage.from(bucket).upload(path,file,{contentType:file.type});if(error)throw error;return db.storage.from(bucket).getPublicUrl(path).data.publicUrl}
+const card=p=>`<div class="card"><a href="#product-${p.id}"><div class="img">${p.image_url?img(p.image_url):"📦"}</div></a><div class="cb"><h3>${esc(p.name)}</h3><span class="price">${fm(p.carton_price)} <span class="mut">/ كرتونة</span></span><span class="mut">القطعة: ${fm(p.unit_price)} · الحد الأدنى: ${p.min_qty_cartons}</span><a class="mut" href="#store-${p.store_id}">${esc(p.store_name)}${p.store_verified?' <span class="vf" title="مورد موثّق">✔</span>':""} – ${wnh(p.store_wilaya_id)}</a></div></div>`;
+const storeCard=s=>`<a class="store" href="#store-${s.id}"><div class="av">${s.logo_url?img(s.logo_url):"🏬"}</div><div><b>${esc(s.name)}</b>${s.is_verified?' <span class="vf" title="مورد موثّق">✔</span>':""}<div class="mut">${wnh(s.wilaya_id)}</div></div></a>`;
+async function shrink(file,max,q){let bm;try{bm=await createImageBitmap(file,{imageOrientation:"from-image"})}catch(e){bm=await createImageBitmap(file)}
+ const r=Math.min(1,max/Math.max(bm.width,bm.height)),w=Math.round(bm.width*r),h=Math.round(bm.height*r),c=document.createElement("canvas");c.width=w;c.height=h;
+ const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(bm,0,0,w,h);if(bm.close)bm.close();
+ let b=await new Promise(k=>c.toBlob(k,"image/webp",q));if(!b||b.type!=="image/webp")b=await new Promise(k=>c.toBlob(k,"image/jpeg",q));return b}
+async function up(bucket,file,max=1000,q=.8){if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>12e6)throw new Error("الصور (JPG/PNG/WebP) فقط وبحجم أقل من 12 ميغا");
+ const b=await shrink(file,max,q),ex=b.type==="image/webp"?"webp":"jpg",path=`${me.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ex}`;
+ const {error}=await db.storage.from(bucket).upload(path,b,{contentType:b.type,cacheControl:"31536000"});if(error)throw error;return db.storage.from(bucket).getPublicUrl(path).data.publicUrl}
 
 /* ---------- boot / auth ---------- */
 async function boot(){
@@ -108,7 +114,7 @@ async function home(){
  <h2>أحدث المنتجات</h2><div class="grid" id="new"></div><h2>التجار</h2><div class="stores" id="ss"></div>
  <div class="box" style="text-align:center;margin-top:30px"><h2 style="margin:0">أنت تاجر جملة؟</h2><p class="mut">اعرض منتجاتك على أصحاب المحلات في كل الولايات.</p><a class="btn" href="#auth">سجّل الآن كمورد</a></div>`);
  const s=()=>{f.q=$("#q").value;f.w=$("#w").value;f.c="";go("products")};$("#go").onclick=s;$("#q").onkeydown=e=>e.key==="Enter"&&s();
- const [p,st]=await Promise.all([db.rpc("search_products",{lim:8}),db.from("stores_public").select("id,name,logo_url,wilaya_id").limit(8)]);
+ const [p,st]=await Promise.all([db.rpc("search_products",{lim:8}),db.from("stores_public").select("id,name,logo_url,wilaya_id,is_verified").limit(8)]);
  $("#new").innerHTML=(p.data||[]).map(card).join("")||'<p class="mut">لا توجد منتجات بعد.</p>';$("#ss").innerHTML=(st.data||[]).map(storeCard).join("")}
 async function products(){
  app(`<div class="lay"><aside class="fl"><div><label>بحث</label><input id="q" value="${esc(f.q)}"></div><div><label>الولاية (التوصيل إلى)</label><select id="w">${opts(f.w,"كل الولايات")}</select></div><div><label>التصنيف</label><select id="c"><option value="">الكل</option>${copts(f.c)}</select></div><div><label>أقصى سعر للكرتونة</label><input id="p" type="number" min="0" value="${esc(f.p)}"></div></aside><section><div class="mut" id="cnt"></div><div class="grid" id="res" style="margin-top:10px"></div></section></div>`);
@@ -117,21 +123,22 @@ async function products(){
  ["q","w","c","p"].forEach(k=>$("#"+k).oninput=e=>{f[k]=e.target.value;clearTimeout(tm);tm=setTimeout(r,300)});r()}
 async function product(id){
  const {data:p}=await db.from("products_public").select().eq("id",id).maybeSingle();if(!p)return app('<p class="mut" style="padding:30px">المنتج غير موجود.</p>');
- const [{data:im},{data:dv}]=await Promise.all([db.from("product_images").select("url").eq("product_id",id).order("sort"),db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",p.store_id)]);
- const ds=new Set((dv||[]).map(x=>x.wilaya_id)),im2=(im||[]).map(x=>x.url);
- app(`<p><a class="mut" href="#products">← العودة للمنتجات</a></p><div class="pd"><div><div class="img big" id="mi">${im2[0]?img(im2[0]):"📦"}</div><div class="th">${im2.length>1?im2.map(u=>`<img src="${esc(u)}" data-src="${esc(u)}" alt="">`).join(""):""}</div></div><div><h1 style="margin:0 0 6px">${esc(p.name)}</h1><p class="price" style="font-size:24px;margin:8px 0">${fm(p.carton_price)} <span class="mut">/ كرتونة (${p.units_per_carton} قطعة)</span></p>
- <div class="row"><span>سعر القطعة</span><b>${fm(p.unit_price)}</b></div><div class="row"><span>الحد الأدنى للطلب</span><b>${p.min_qty_cartons} كرتونة</b></div><div class="row"><span>المخزون</span><b class="${p.stock_cartons?"ok":"no"}">${p.stock_cartons?p.stock_cartons+" كرتونة – متوفر":"غير متوفر"}</b></div><div class="row"><span>المورد</span><a href="#store-${p.store_id}"><b>${esc(p.store_name)}</b> – ${wnh(p.store_wilaya_id)}</a></div>
+ const [{data:im},{data:dv}]=await Promise.all([db.from("product_images").select("url,thumb_url").eq("product_id",id).order("sort"),db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",p.store_id)]);
+ const ds=new Set((dv||[]).map(x=>x.wilaya_id)),im2=(im||[]).map(x=>x.url),im3=(im||[]).map(x=>x.thumb_url||x.url);
+ app(`<p><a class="mut" href="#products">← العودة للمنتجات</a></p><div class="pd"><div><div class="img big" id="mi">${im2[0]?img(im2[0]):"📦"}</div><div class="th">${im2.length>1?im2.map((u,k)=>`<img src="${esc(im3[k])}" data-src="${esc(u)}" alt="">`).join(""):""}</div></div><div><h1 style="margin:0 0 6px">${esc(p.name)}</h1><p class="price" style="font-size:24px;margin:8px 0">${fm(p.carton_price)} <span class="mut">/ كرتونة (${p.units_per_carton} قطعة)</span></p>
+ <div class="row"><span>سعر القطعة</span><b>${fm(p.unit_price)}</b></div><div class="row"><span>الحد الأدنى للطلب</span><b>${p.min_qty_cartons} كرتونة</b></div><div class="row"><span>المخزون</span><b class="${p.stock_cartons?"ok":"no"}">${p.stock_cartons?p.stock_cartons+" كرتونة – متوفر":"غير متوفر"}</b></div><div class="row"><span>المورد</span><a href="#store-${p.store_id}"><b>${esc(p.store_name)}</b>${p.store_verified?' <span class="vf" title="مورد موثّق">✔</span>':""} – ${wnh(p.store_wilaya_id)}</a></div>
  <p>${esc(p.description||"")}</p><div style="display:flex;gap:8px;margin:14px 0"><input id="qt" type="number" min="${p.min_qty_cartons}" value="${p.min_qty_cartons}" style="width:90px" aria-label="الكمية"><select id="w" aria-label="الولاية">${opts(f.w,"اختر ولاية التوصيل")}</select></div><p class="mut" id="dv"></p><a class="btn wa" id="wa" target="_blank" rel="noopener" style="width:100%">💬 اطلب عبر واتساب</a></div></div>`);
  const u=()=>{const q=Math.max(+$("#qt").value||p.min_qty_cartons,p.min_qty_cartons),w=$("#w").value;f.w=w;
   const t=`السلام عليكم، لقد رأيت منتج ${p.name} بسعر ${p.carton_price} دج للكرتونة، أرغب بشراء ${q} كرتونة`+(w?` والتوصيل إلى ولاية ${wn(w)}`:"")+". شكراً.";
   $("#wa").href=`https://wa.me/${p.whatsapp_phone}?text=${encodeURIComponent(t)}`;$("#dv").textContent=w?(ds.has(+w)?"✓ يوزّع المورد إلى "+wn(w):"⚠ قد لا يوزّع المورد إلى "+wn(w)+"، اسأله قبل الطلب"):"";return q};
  $("#qt").oninput=u;$("#w").oninput=u;u();
+ try{if(!sessionStorage.getItem("v"+id)){sessionStorage.setItem("v"+id,1);db.rpc("track_view",{p_product:id}).then(()=>{})}}catch(e){}
  $("#wa").onclick=()=>{const q=u();db.rpc("log_whatsapp_click",{p_product:p.id,p_wilaya:f.w?+f.w:null,p_qty:q}).then(()=>{})}}
 async function store(id){
  const {data:s}=await db.from("stores_public").select().eq("id",id).maybeSingle();if(!s)return app('<p class="mut" style="padding:30px">المتجر غير موجود.</p>');
  const [{data:p},{data:dv}]=await Promise.all([db.from("products_public").select().eq("store_id",id).order("created_at",{ascending:false}),db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",id)]);
- app(`<div class="store" style="margin-top:20px;padding:20px"><div class="av" style="width:72px;height:72px;font-size:32px">${s.logo_url?img(s.logo_url):"🏬"}</div><div><h1 style="margin:0">${esc(s.name)}</h1><div class="mut">📍 ${wnh(s.wilaya_id)}${s.address?" · "+esc(s.address):""} · يوزّع إلى ${(dv||[]).length} ولاية</div><p style="margin:6px 0">${esc(s.description||"")}</p><a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/${s.whatsapp_phone}">💬 تواصل عبر واتساب</a></div></div><h2>منتجات المتجر</h2><div class="grid">${(p||[]).map(card).join("")||'<p class="mut">لا توجد منتجات.</p>'}</div>`)}
-async function stores(){const {data}=await db.from("stores_public").select("id,name,logo_url,wilaya_id").order("created_at",{ascending:false});app(`<h2>جميع التجار</h2><div class="stores">${(data||[]).map(storeCard).join("")||'<p class="mut">لا يوجد تجار بعد.</p>'}</div>`)}
+ app(`<div class="store" style="margin-top:20px;padding:20px"><div class="av" style="width:72px;height:72px;font-size:32px">${s.logo_url?img(s.logo_url):"🏬"}</div><div><h1 style="margin:0">${esc(s.name)}${s.is_verified?' <span class="vf" title="مورد موثّق">✔</span>':""}</h1><div class="mut">📍 ${wnh(s.wilaya_id)}${s.address?" · "+esc(s.address):""} · يوزّع إلى ${(dv||[]).length} ولاية</div><p style="margin:6px 0">${esc(s.description||"")}</p><a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/${s.whatsapp_phone}">💬 تواصل عبر واتساب</a></div></div><h2>منتجات المتجر</h2><div class="grid">${(p||[]).map(card).join("")||'<p class="mut">لا توجد منتجات.</p>'}</div>`)}
+async function stores(){const {data}=await db.from("stores_public").select("id,name,logo_url,wilaya_id,is_verified").order("created_at",{ascending:false});app(`<h2>جميع التجار</h2><div class="stores">${(data||[]).map(storeCard).join("")||'<p class="mut">لا يوجد تجار بعد.</p>'}</div>`)}
 
 /* ---------- auth ---------- */
 function auth(){if(me)return go(prof?.role==="supplier"?"dash":"home");let reg=false;
@@ -153,37 +160,47 @@ async function dash(){
  const dv=s?((await db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",s.id)).data||[]).map(x=>x.wilaya_id):[];
  app(`<h2>${s?"متجري":"أنشئ متجرك"} ${s?`<span class="tag">${ST[s.status]}</span>`:""}</h2>
  ${s&&s.status!=="approved"?`<div class="box">${s.status==="pending"?"⏳ متجرك قيد المراجعة ولن يظهر للزوار حتى يعتمده المشرف.":"⛔ متجرك موقوف. تواصل مع الإدارة."}</div>`:""}<form class="box form" id="sf"><div><label>اسم المتجر</label><input id="sn" value="${esc(s?.name)}" required></div><div><label>الولاية</label><select id="sw" required>${opts(s?.wilaya_id??"","اختر")}</select></div>
- <div><label>رقم واتساب</label><input id="sp" type="tel" value="${esc(s?"0"+s.whatsapp_phone.slice(3):prof.phone?"0"+prof.phone.slice(3):"")}" required></div><div><label>العنوان</label><input id="sa" value="${esc(s?.address)}"></div>
+ <div><label>رقم واتساب</label><input id="sp" type="tel" value="${esc(s?"0"+s.whatsapp_phone.slice(3):prof.phone?"0"+prof.phone.slice(3):"")}" required></div><div><label>العنوان</label><input id="sa" value="${esc(s?.address)}"></div><div class="f"><label>رقم السجل التجاري (لشارة التوثيق ✔ وأولوية الظهور في البحث)</label><input id="cr" value="${esc(s?.commercial_register)}" maxlength="30">${s?.is_verified?'<span class="ok">✔ متجرك موثّق</span>':'<span class="mut">يراجعه المشرف ثم يمنحك الشارة.</span>'}</div>
  <div class="f"><label>وصف المتجر</label><textarea id="sd" rows="3">${esc(s?.description)}</textarea></div><div class="f"><label>الشعار (صورة)</label><input id="lg" type="file" accept="image/jpeg,image/png,image/webp"></div>
  <div class="f"><details><summary>الولايات التي توزّع إليها (<span id="dc">${dv.length}</span>)</summary><button type="button" class="btn ghost sm" id="all">تحديد الكل / إلغاء</button><div class="dws">${W.map(w=>`<label><input type="checkbox" class="dw" value="${w.id}"${dv.includes(w.id)?" checked":""}>${esc(w.name_ar)}</label>`).join("")}</div></details></div><button class="btn f">حفظ المتجر</button></form>
- <div id="ps"></div>`);
+ ${s&&s.status==="approved"?`<div class="box">🔗 رابط متجرك للمشاركة مع زبائنك:<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><input readonly id="lk" value="${esc(location.origin+location.pathname+"#store-"+s.id)}" style="flex:1 1 220px"><button type="button" class="btn sm" id="cp">نسخ</button><a class="btn wa sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent("تصفح منتجاتنا بالجملة على سوق الجملة: "+location.origin+location.pathname+"#store-"+s.id)}">مشاركة</a></div></div>`:""}<div id="st"></div><div id="ps"></div>`);
  $("#all").onclick=()=>{const b=[...document.querySelectorAll(".dw")],on=b.some(x=>!x.checked);b.forEach(x=>x.checked=on)};
  $("#sf").onsubmit=async e=>{e.preventDefault();try{const ph=norm($("#sp").value);if(!/^213[567]\d{8}$/.test(ph))return msg("رقم واتساب غير صحيح");
-  let logo=s?.logo_url||null;const fl=$("#lg").files[0];if(fl)logo=await up("store-logos",fl);
-  const {error:er}=await db.rpc("save_store",{p_name:$("#sn").value,p_desc:$("#sd").value,p_wilaya:+$("#sw").value,p_address:$("#sa").value,p_phone:ph,p_logo:logo,p_delivery:[...document.querySelectorAll(".dw:checked")].map(x=>+x.value)});
+  let logo=s?.logo_url||null;const fl=$("#lg").files[0];if(fl)logo=await up("store-logos",fl,400,.8);
+  const {error:er}=await db.rpc("save_store",{p_name:$("#sn").value,p_desc:$("#sd").value,p_wilaya:+$("#sw").value,p_address:$("#sa").value,p_phone:ph,p_logo:logo,p_cr:$("#cr").value.trim()||null,p_delivery:[...document.querySelectorAll(".dw:checked")].map(x=>+x.value)});
   if(er)throw er;msg("تم الحفظ ✓",1);dash()}catch(x){msg(x.message)}};
- if(s)prodSection(s)}
+ const cp=$("#cp");if(cp)cp.onclick=()=>{try{navigator.clipboard.writeText($("#lk").value).then(()=>msg("تم النسخ ✓",1))}catch(e){$("#lk").select()}};
+ if(s){statsSection(s);prodSection(s)}}
+async function statsSection(s,days=30){
+ const el=$("#st"),{data:a,error}=await db.rpc("supplier_stats",{p_days:days});if(!el||error||!a)return;
+ const mx=Math.max(1,...a.daily.map(x=>Math.max(x.v,x.c))),cv=a.views?Math.round(a.clicks*100/a.views):0,pc=n=>Math.round(n*1000/mx)/10;
+ el.innerHTML=`<h2>إحصائيات متجرك <select id="sd2" style="width:auto;min-height:34px">${[7,30,90].map(n=>`<option value="${n}"${n===days?" selected":""}>آخر ${n} يوماً</option>`).join("")}</select></h2>
+ <div class="stat"><div><b>${a.views}</b><span class="mut">مشاهدات المنتجات</span></div><div><b>${a.clicks}</b><span class="mut">نقرات واتساب</span></div><div><b>${cv}%</b><span class="mut">نسبة التحويل</span></div><div><b>${a.qty}</b><span class="mut">كراتين مطلوبة</span></div></div>
+ <div class="box"><div class="mut">يومياً: النقرات (أزرق) فوق المشاهدات (رمادي)</div><div class="chart">${a.daily.map(x=>`<i title="${x.d}: ${x.v} مشاهدة، ${x.c} نقرة" style="--v:${pc(x.v)}%;--c:${pc(x.c)}%"></i>`).join("")}</div></div>
+ <div class="box"><b>أداء المنتجات</b>${a.products.slice(0,10).map(p=>`<div class="tr"><span>${esc(p.name)}</span><span class="mut">👁 ${p.views} · 💬 ${p.clicks}</span></div>`).join("")||'<p class="mut">لا بيانات بعد.</p>'}</div>
+ <div class="box"><b>الولايات الأكثر طلباً</b>${a.wilayas.map(w=>`<div class="tr"><span>${wnh(w.wilaya_id)}</span><span class="mut">${w.clicks} نقرة</span></div>`).join("")||'<p class="mut">لا بيانات بعد.</p>'}</div>`;
+ $("#sd2").onchange=e=>statsSection(s,+e.target.value)}
 async function prodSection(s,ed){
- const {data}=await db.from("products").select("*,product_images(url)").eq("store_id",s.id).order("created_at",{ascending:false});cache=data||[];
+ const {data}=await db.from("products").select("*,product_images(url,thumb_url)").eq("store_id",s.id).order("created_at",{ascending:false});cache=data||[];
  const p=ed&&ed!=="new"?cache.find(x=>x.id===ed):null;
  $("#ps").innerHTML=`<h2>منتجاتي (${cache.length}) <button class="btn sm" data-act="pnew">+ منتج جديد</button></h2>
  ${ed?`<form class="box form" id="pf"><div class="f"><label>اسم المنتج</label><input id="pn" value="${esc(p?.name)}" required></div><div><label>التصنيف</label><select id="pc">${copts(p?.category_id)}</select></div><div><label>سعر الكرتونة (دج)</label><input id="pp" type="number" min="1" step="0.01" value="${p?.carton_price??""}" required></div>
  <div><label>عدد القطع في الكرتونة</label><input id="pu" type="number" min="1" value="${p?.units_per_carton??1}" required></div><div><label>الحد الأدنى للطلب (كرتونة)</label><input id="pm" type="number" min="1" value="${p?.min_qty_cartons??1}" required></div>
  <div><label>المخزون (كرتونة)</label><input id="pk" type="number" min="0" value="${p?.stock_cartons??0}" required></div><div><label>صور المنتج (حتى 4)</label><input id="pi" type="file" accept="image/jpeg,image/png,image/webp" multiple></div>
  <div class="f"><label>الوصف</label><textarea id="pd" rows="2">${esc(p?.description)}</textarea></div><div class="f" style="display:flex;gap:8px"><button class="btn">حفظ المنتج</button><button type="button" class="btn ghost" data-act="pcancel">إلغاء</button></div></form>`:""}
- ${cache.map(x=>`<div class="tr"><span style="display:flex;gap:10px;align-items:center"><span class="av" style="width:40px;height:40px">${x.product_images?.[0]?img(x.product_images[0].url):"📦"}</span><span><b>${esc(x.name)}</b><br><span class="mut">${fm(x.carton_price)} · مخزون ${x.stock_cartons}${x.is_hidden_by_admin?" · ⛔ محجوب من الإدارة":""}${x.is_active?"":" · مخفي"}</span></span></span><span><button class="btn ghost sm" data-act="pedit" data-id="${x.id}">تعديل</button> <button class="btn ghost sm" data-act="ptog" data-id="${x.id}">${x.is_active?"إخفاء":"إظهار"}</button> <button class="btn red sm" data-act="pdel" data-id="${x.id}">حذف</button></span></div>`).join("")||'<p class="mut">لم تضف منتجات بعد.</p>'}`;
- const pf=$("#pf");if(pf)pf.onsubmit=async e=>{e.preventDefault();try{const fs=[...$("#pi").files].slice(0,4),urls=[];for(const x of fs)urls.push(await up("product-images",x));
-  const {error:er}=await db.rpc("save_product",{p_id:p?.id||null,p_store:s.id,p_cat:+$("#pc").value,p_name:$("#pn").value,p_desc:$("#pd").value,p_price:+$("#pp").value,p_upc:+$("#pu").value,p_min:+$("#pm").value,p_stock:+$("#pk").value,p_images:urls});
+ ${cache.map(x=>`<div class="tr"><span style="display:flex;gap:10px;align-items:center"><span class="av" style="width:40px;height:40px">${x.product_images?.[0]?img(x.product_images[0].thumb_url||x.product_images[0].url):"📦"}</span><span><b>${esc(x.name)}</b><br><span class="mut">${fm(x.carton_price)} · مخزون ${x.stock_cartons}${x.is_hidden_by_admin?" · ⛔ محجوب من الإدارة":""}${x.is_active?"":" · مخفي"}</span></span></span><span><button class="btn ghost sm" data-act="pedit" data-id="${x.id}">تعديل</button> <button class="btn ghost sm" data-act="ptog" data-id="${x.id}">${x.is_active?"إخفاء":"إظهار"}</button> <button class="btn red sm" data-act="pdel" data-id="${x.id}">حذف</button></span></div>`).join("")||'<p class="mut">لم تضف منتجات بعد.</p>'}`;
+ const pf=$("#pf");if(pf)pf.onsubmit=async e=>{e.preventDefault();try{const fs=[...$("#pi").files].slice(0,4),urls=[],ths=[];if(fs.length)msg("جارٍ ضغط ورفع الصور…",1);for(const x of fs){urls.push(await up("product-images",x,1000,.8));ths.push(await up("product-images",x,400,.7))}
+  const {error:er}=await db.rpc("save_product",{p_id:p?.id||null,p_store:s.id,p_cat:+$("#pc").value,p_name:$("#pn").value,p_desc:$("#pd").value,p_price:+$("#pp").value,p_upc:+$("#pu").value,p_min:+$("#pm").value,p_stock:+$("#pk").value,p_images:urls,p_thumbs:ths});
   if(er)throw er;msg("تم الحفظ ✓",1);prodSection(s)}catch(x){msg(x.message)}};
  prodSection.s=s}
 
 /* ---------- admin ---------- */
 async function admin(){
  if(prof?.role!=="admin")return go("home");
- const [st,ss,pp,us]=await Promise.all([db.from("admin_stats").select().single(),db.from("stores").select("id,name,status,whatsapp_phone,wilaya_id").order("created_at",{ascending:false}).limit(100),db.from("products").select("id,name,is_hidden_by_admin,stores(name)").order("created_at",{ascending:false}).limit(60),db.from("profiles").select("id,full_name,phone,role,is_blocked").neq("role","admin").order("created_at",{ascending:false}).limit(60)]);
+ const [st,ss,pp,us]=await Promise.all([db.from("admin_stats").select().single(),db.from("stores").select("id,name,status,whatsapp_phone,wilaya_id,commercial_register,is_verified").order("created_at",{ascending:false}).limit(100),db.from("products").select("id,name,is_hidden_by_admin,stores(name)").order("created_at",{ascending:false}).limit(60),db.from("profiles").select("id,full_name,phone,role,is_blocked").neq("role","admin").order("created_at",{ascending:false}).limit(60)]);
  const a=st.data||{},L={suppliers:"الموردون",shop_owners:"أصحاب المحلات",pending_stores:"متاجر بانتظار المراجعة",active_products:"منتجات نشطة",clicks_7d:"نقرات واتساب (7 أيام)",clicks_30d:"نقرات واتساب (30 يوم)"};
  app(`<h2>لوحة الإدارة</h2><div class="stat">${Object.keys(L).map(k=>`<div><b>${a[k]??0}</b><span class="mut">${L[k]}</span></div>`).join("")}</div>
- <h2>المتاجر</h2><div class="box">${(ss.data||[]).map(s=>`<div class="tr"><span><b>${esc(s.name)}</b> <span class="tag">${ST[s.status]}</span><br><span class="mut">${wnh(s.wilaya_id)} · ${esc(s.whatsapp_phone)}</span></span><span>${s.status!=="approved"?`<button class="btn sm" data-act="ast" data-id="${s.id}" data-v="approved">اعتماد</button> `:""}${s.status!=="suspended"?`<button class="btn red sm" data-act="ast" data-id="${s.id}" data-v="suspended">إيقاف</button>`:""}</span></div>`).join("")||'<p class="mut">لا توجد متاجر.</p>'}</div>
+ <h2>المتاجر</h2><div class="box">${(ss.data||[]).map(s=>`<div class="tr"><span><b>${esc(s.name)}</b>${s.is_verified?' <span class="vf" title="مورد موثّق">✔</span>':""} <span class="tag">${ST[s.status]}</span><br><span class="mut">${wnh(s.wilaya_id)} · ${esc(s.whatsapp_phone)}${s.commercial_register?" · سجل: "+esc(s.commercial_register):""}</span></span><span><button class="btn ghost sm" data-act="avf" data-id="${s.id}" data-v="${s.is_verified?0:1}">${s.is_verified?"إلغاء التوثيق":"توثيق ✔"}</button> ${s.status!=="approved"?`<button class="btn sm" data-act="ast" data-id="${s.id}" data-v="approved">اعتماد</button> `:""}${s.status!=="suspended"?`<button class="btn red sm" data-act="ast" data-id="${s.id}" data-v="suspended">إيقاف</button>`:""}</span></div>`).join("")||'<p class="mut">لا توجد متاجر.</p>'}</div>
  <h2>المنتجات</h2><div class="box">${(pp.data||[]).map(x=>`<div class="tr"><span><b>${esc(x.name)}</b> <span class="mut">– ${esc(x.stores?.name)}</span></span><button class="btn ${x.is_hidden_by_admin?"":"ghost "}sm" data-act="ahide" data-id="${x.id}" data-v="${x.is_hidden_by_admin?0:1}">${x.is_hidden_by_admin?"إلغاء الحجب":"حجب"}</button></div>`).join("")||'<p class="mut">لا توجد منتجات.</p>'}</div>
  <h2>المستخدمون</h2><div class="box">${(us.data||[]).map(x=>`<div class="tr"><span><b>${esc(x.full_name||"—")}</b> <span class="tag">${x.role==="supplier"?"مورد":"صاحب محل"}</span>${x.is_blocked?' <span class="tag no">محظور</span>':""}<br><span class="mut">${esc(x.phone||"")}</span></span><button class="btn ${x.is_blocked?"":"red "}sm" data-act="ublk" data-id="${x.id}" data-v="${x.is_blocked?0:1}">${x.is_blocked?"إلغاء الحظر":"حظر"}</button></div>`).join("")||'<p class="mut">لا يوجد مستخدمون.</p>'}</div>`)}
 
@@ -195,6 +212,7 @@ document.addEventListener("click",async e=>{const t=e.target,d=t.dataset||{};
  else if(d.act==="pdel"){if(confirm("حذف هذا المنتج نهائياً؟")){await db.from("products").delete().eq("id",d.id);prodSection(s)}}
  else if(d.act==="ast"){const {error}=await db.from("stores").update({status:d.v}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"store_"+d.v,target:d.id});admin()}
  else if(d.act==="ahide"){const {error}=await db.from("products").update({is_hidden_by_admin:d.v==="1"}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"hide_"+d.v,target:d.id});admin()}
+ else if(d.act==="avf"){const {error}=await db.from("stores").update({is_verified:d.v==="1"}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"verify_"+d.v,target:d.id});admin()}
  else if(d.act==="ublk"){const {error}=await db.from("profiles").update({is_blocked:d.v==="1"}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"user_block_"+d.v,target:d.id});admin()}}catch(x){msg(x.message)}});
 boot();
 </script>
