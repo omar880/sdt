@@ -1,5 +1,5 @@
-const CACHE = 'souq-shell-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
+const CACHE = 'souq-shell-v2';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png', './offline.html'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
   self.skipWaiting();
@@ -15,7 +15,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(req).then(res => {
       if (res.ok) caches.open(CACHE).then(cache => cache.put('./index.html', res.clone()));
       return res;
-    }).catch(() => caches.match('./index.html')));
+    }).catch(() => caches.match('./offline.html')));
     return;
   }
   if (SHELL.some(item => new URL(item, self.location.href).pathname === url.pathname)) {
