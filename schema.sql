@@ -597,3 +597,324 @@ revoke execute on function save_store(text, text, smallint, text, text, text, sm
 revoke execute on function save_product(uuid, uuid, int, text, text, numeric, int, int, int, text[]) from public, anon;
 grant  execute on function save_store(text, text, smallint, text, text, text, smallint[]) to authenticated;
 grant  execute on function save_product(uuid, uuid, int, text, text, numeric, int, int, int, text[]) to authenticated;
+
+
+-- ============================================================
+-- v1.2 — بحث عربي موحّد + إحصائيات المورد  (آمن لإعادة التشغيل)
+-- ============================================================
+create or replace function norm_ar(t text) returns text language sql immutable as $$
+  select translate(regexp_replace(lower(coalesce(t,'')), '[\u064B-\u0652\u0640]', '', 'g'), 'أإآةىؤئ', 'اااهيوي') $$;
+create index if not exists products_name_norm on products using gin (norm_ar(name) gin_trgm_ops);
+
+create or replace function search_products(
+  q text default null, delivers_to smallint default null, cat_id int default null,
+  max_price numeric default null, lim int default 24, off int default 0
+) returns setof products_public
+language sql stable set search_path = public as $$
+  select * from products_public pp
+  where (q is null or q = '' or norm_ar(pp.name) like '%' || norm_ar(left(q, 60)) || '%'
+         or norm_ar(pp.store_name) like '%' || norm_ar(left(q, 60)) || '%')
+    and (cat_id is null or pp.category_id = cat_id
+         or pp.category_id in (select id from categories where parent_id = cat_id))
+    and (max_price is null or pp.carton_price <= max_price)
+    and (delivers_to is null or exists (
+          select 1 from store_delivery_wilayas d
+          where d.store_id = pp.store_id and d.wilaya_id = delivers_to))
+  order by pp.created_at desc
+  limit least(greatest(coalesce(lim, 24), 1), 48)
+  offset greatest(coalesce(off, 0), 0);
+$$;
+
+create or replace function my_stats()
+returns table(product_id uuid, name text, clicks7 bigint, clicks30 bigint)
+language sql stable set search_path = public as $$
+  select p.id, p.name,
+         count(c.id) filter (where c.created_at > now() - interval '7 days'),
+         count(c.id) filter (where c.created_at > now() - interval '30 days')
+  from products p
+  join stores s on s.id = p.store_id and s.owner_id = auth.uid()
+  left join whatsapp_clicks c on c.product_id = p.id and c.created_at > now() - interval '30 days'
+  group by p.id, p.name order by 4 desc, p.name;
+$$;
+
+create or replace function my_stats_wilaya()
+returns table(wilaya_id smallint, clicks bigint)
+language sql stable set search_path = public as $$
+  select c.wilaya_id, count(*)
+  from whatsapp_clicks c
+  join stores s on s.id = c.store_id and s.owner_id = auth.uid()
+  where c.wilaya_id is not null and c.created_at > now() - interval '30 days'
+  group by c.wilaya_id order by 2 desc limit 10;
+$$;
+
+revoke execute on function my_stats(), my_stats_wilaya() from public, anon;
+grant  execute on function my_stats(), my_stats_wilaya() to authenticated;
+
+
+-- ============================================================
+-- v1.3 — ترتيب النتائج (الأحدث / الأرخص / الأغلى)
+-- ============================================================
+drop function if exists search_products(text, smallint, int, numeric, int, int);
+create or replace function search_products(
+  q text default null, delivers_to smallint default null, cat_id int default null,
+  max_price numeric default null, lim int default 24, off int default 0, sort_by text default 'new'
+) returns setof products_public
+language sql stable set search_path = public as $$
+  select * from products_public pp
+  where (q is null or q = '' or norm_ar(pp.name) like '%' || norm_ar(left(q, 60)) || '%'
+         or norm_ar(pp.store_name) like '%' || norm_ar(left(q, 60)) || '%')
+    and (cat_id is null or pp.category_id = cat_id
+         or pp.category_id in (select id from categories where parent_id = cat_id))
+    and (max_price is null or pp.carton_price <= max_price)
+    and (delivers_to is null or exists (
+          select 1 from store_delivery_wilayas d
+          where d.store_id = pp.store_id and d.wilaya_id = delivers_to))
+  order by case when sort_by = 'cheap' then pp.carton_price end asc,
+           case when sort_by = 'exp'   then pp.carton_price end desc,
+           pp.created_at desc
+  limit least(greatest(coalesce(lim, 24), 1), 48)
+  offset greatest(coalesce(off, 0), 0);
+$$;
+
+
+-- ============================================================
+-- v1.4 — شارة التوثيق + استيراد المنتجات بالجملة
+-- ============================================================
+alter table stores add column if not exists verified boolean not null default false;
+
+create or replace function protect_store_verified() returns trigger
+language plpgsql set search_path = public as $$
+begin
+  if auth.uid() is not null and not is_admin() then
+    if tg_op = 'INSERT' then new.verified := false;
+    elsif new.verified is distinct from old.verified then raise exception 'Only admins can verify'; end if;
+  end if;
+  return new;
+end $$;
+drop trigger if exists trg_protect_verified on stores;
+create trigger trg_protect_verified before insert or update on stores
+  for each row execute function protect_store_verified();
+
+create or replace view stores_public with (security_invoker = false) as
+select s.id, s.name, s.description, s.logo_url, s.wilaya_id, s.address, s.whatsapp_phone, s.created_at, s.verified
+from stores s
+where s.status = 'approved' and not is_blocked_user(s.owner_id);
+grant select on stores_public to anon, authenticated;
+
+create or replace function import_products(p_store uuid, p_rows jsonb) returns int
+language plpgsql set search_path = public as $$
+declare r jsonb; n int := 0; cid int;
+begin
+  if jsonb_array_length(p_rows) > 300 then raise exception 'الحد الأقصى 300 صف'; end if;
+  for r in select * from jsonb_array_elements(p_rows) loop
+    select id into cid from categories where name_ar = trim(r->>'category') limit 1;
+    insert into products (store_id, category_id, name, description, carton_price,
+                          units_per_carton, min_qty_cartons, stock_cartons)
+    values (p_store, coalesce(cid, (select id from categories order by sort limit 1)),
+            trim(r->>'name'), r->>'description', (r->>'carton_price')::numeric,
+            greatest(coalesce((r->>'units_per_carton')::int, 1), 1),
+            greatest(coalesce((r->>'min_qty')::int, 1), 1),
+            greatest(coalesce((r->>'stock')::int, 0), 0));
+    n := n + 1;
+  end loop;
+  return n;
+end $$;
+revoke execute on function import_products(uuid, jsonb) from public, anon;
+grant  execute on function import_products(uuid, jsonb) to authenticated;
+
+
+-- ============================================================
+-- v1.5 — تاريخ السعر، وضع الإجازة، تقييمات، بلاغات، طلبات عروض الأسعار
+-- ============================================================
+alter table stores   add column if not exists is_paused boolean not null default false;
+alter table products add column if not exists price_updated_at timestamptz not null default now();
+
+create or replace function touch_price() returns trigger language plpgsql as $$
+begin
+  if new.carton_price is distinct from old.carton_price then new.price_updated_at := now(); end if;
+  return new;
+end $$;
+drop trigger if exists trg_touch_price on products;
+create trigger trg_touch_price before update on products for each row execute function touch_price();
+
+drop function if exists search_products(text, smallint, int, numeric, int, int, text);
+create or replace view products_public with (security_invoker = false) as
+select p.id, p.name, p.description, p.carton_price, p.unit_price, p.units_per_carton,
+       p.min_qty_cartons, p.stock_cartons, p.category_id, p.created_at,
+       s.id as store_id, s.name as store_name, s.logo_url, s.wilaya_id as store_wilaya_id,
+       s.whatsapp_phone,
+       (select url from product_images i where i.product_id = p.id order by sort limit 1) as image_url,
+       p.price_updated_at
+from products p join stores s on s.id = p.store_id
+where p.is_active and not p.is_hidden_by_admin and s.status = 'approved'
+  and not s.is_paused and not is_blocked_user(s.owner_id);
+grant select on products_public to anon, authenticated;
+
+create or replace view stores_public with (security_invoker = false) as
+select s.id, s.name, s.description, s.logo_url, s.wilaya_id, s.address, s.whatsapp_phone, s.created_at, s.verified
+from stores s
+where s.status = 'approved' and not s.is_paused and not is_blocked_user(s.owner_id);
+grant select on stores_public to anon, authenticated;
+
+create or replace function search_products(
+  q text default null, delivers_to smallint default null, cat_id int default null,
+  max_price numeric default null, lim int default 24, off int default 0, sort_by text default 'new'
+) returns setof products_public
+language sql stable set search_path = public as $$
+  select * from products_public pp
+  where (q is null or q = '' or norm_ar(pp.name) like '%' || norm_ar(left(q, 60)) || '%'
+         or norm_ar(pp.store_name) like '%' || norm_ar(left(q, 60)) || '%')
+    and (cat_id is null or pp.category_id = cat_id
+         or pp.category_id in (select id from categories where parent_id = cat_id))
+    and (max_price is null or pp.carton_price <= max_price)
+    and (delivers_to is null or exists (
+          select 1 from store_delivery_wilayas d
+          where d.store_id = pp.store_id and d.wilaya_id = delivers_to))
+  order by case when sort_by = 'cheap' then pp.carton_price end asc,
+           case when sort_by = 'exp'   then pp.carton_price end desc,
+           pp.created_at desc
+  limit least(greatest(coalesce(lim, 24), 1), 48)
+  offset greatest(coalesce(off, 0), 0);
+$$;
+
+-- تقييمات الموردين (أصحاب المحلات فقط، تقييم واحد لكل متجر)
+create table if not exists reviews (
+  store_id uuid not null references stores(id) on delete cascade,
+  user_id  uuid not null references profiles(id) on delete cascade,
+  rating   smallint not null check (rating between 1 and 5),
+  comment  text check (char_length(comment) <= 300),
+  author   text,
+  created_at timestamptz not null default now(),
+  primary key (store_id, user_id)
+);
+alter table reviews enable row level security;
+drop policy if exists "reviews read" on reviews;
+create policy "reviews read" on reviews for select using (true);
+drop policy if exists "reviews admin" on reviews;
+create policy "reviews admin" on reviews for all using (is_admin()) with check (is_admin());
+create or replace view store_ratings with (security_invoker = false) as
+  select store_id, avg(rating)::numeric(3,2) as avg, count(*) as cnt from reviews group by store_id;
+grant select on store_ratings to anon, authenticated;
+
+create or replace function save_review(p_store uuid, p_rating int, p_comment text) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null or is_blocked_user(auth.uid()) or not email_confirmed() then
+    raise exception 'سجّل الدخول وأكّد بريدك أولاً'; end if;
+  if not exists (select 1 from profiles where id = auth.uid() and role = 'shop_owner') then
+    raise exception 'التقييم لأصحاب المحلات فقط'; end if;
+  if not exists (select 1 from stores_public where id = p_store) then raise exception 'المتجر غير موجود'; end if;
+  insert into reviews (store_id, user_id, rating, comment, author)
+  values (p_store, auth.uid(), least(greatest(p_rating, 1), 5), left(p_comment, 300),
+          (select split_part(full_name, ' ', 1) from profiles where id = auth.uid()))
+  on conflict (store_id, user_id) do update
+    set rating = excluded.rating, comment = excluded.comment, created_at = now();
+end $$;
+revoke execute on function save_review(uuid, int, text) from public, anon;
+grant  execute on function save_review(uuid, int, text) to authenticated;
+
+-- بلاغات المستخدمين
+create table if not exists reports (
+  id bigint generated always as identity primary key,
+  product_id uuid references products(id) on delete cascade,
+  store_id   uuid references stores(id) on delete cascade,
+  user_id    uuid references profiles(id) on delete set null,
+  reason     text not null check (char_length(reason) between 3 and 300),
+  created_at timestamptz not null default now()
+);
+alter table reports enable row level security;
+drop policy if exists "reports insert" on reports;
+create policy "reports insert" on reports for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "reports admin" on reports;
+create policy "reports admin" on reports for all using (is_admin()) with check (is_admin());
+
+-- طلبات عروض الأسعار (صاحب المحل ينشر، الموردون يرون ويتواصلون)
+create table if not exists rfq (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  wilaya_id smallint not null references wilayas(id),
+  item  text not null check (char_length(item) between 3 and 200),
+  qty   text check (char_length(qty) <= 60),
+  phone text not null check (phone ~ '^213[567][0-9]{8}$'),
+  created_at timestamptz not null default now()
+);
+create index if not exists rfq_created on rfq (created_at desc);
+alter table rfq enable row level security;
+drop policy if exists "rfq read" on rfq;
+create policy "rfq read" on rfq for select using (user_id = auth.uid() or is_active_supplier() or is_admin());
+drop policy if exists "rfq insert" on rfq;
+create policy "rfq insert" on rfq for insert with check (
+  user_id = auth.uid() and email_confirmed()
+  and exists (select 1 from profiles where id = auth.uid() and role = 'shop_owner' and not is_blocked)
+  and (select count(*) from rfq r where r.user_id = auth.uid() and r.created_at > now() - interval '1 day') < 5);
+drop policy if exists "rfq delete" on rfq;
+create policy "rfq delete" on rfq for delete using (user_id = auth.uid() or is_admin());
+
+
+-- ============================================================
+-- v1.6 — روابط/ساعات/توصيل، رابط الدعوة، أسعار حسب الكمية، عروض بمدة
+-- ============================================================
+alter table stores
+  add column if not exists facebook text check (facebook ~ '^https://(www\.)?(facebook|fb)\.com/'),
+  add column if not exists instagram text check (instagram ~ '^https://(www\.)?instagram\.com/'),
+  add column if not exists hours text check (char_length(hours) <= 100),
+  add column if not exists delivery_fee int check (delivery_fee >= 0),
+  add column if not exists delivery_days smallint check (delivery_days between 1 and 30),
+  add column if not exists min_order int check (min_order >= 0);
+
+create or replace view stores_public with (security_invoker = false) as
+select s.id, s.name, s.description, s.logo_url, s.wilaya_id, s.address, s.whatsapp_phone, s.created_at, s.verified,
+       s.facebook, s.instagram, s.hours, s.delivery_fee, s.delivery_days, s.min_order
+from stores s
+where s.status = 'approved' and not s.is_paused and not is_blocked_user(s.owner_id);
+grant select on stores_public to anon, authenticated;
+
+-- رابط الدعوة
+alter table profiles add column if not exists referred_by uuid references profiles(id) on delete set null;
+create or replace function handle_new_user() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare ref uuid;
+begin
+  if (new.raw_user_meta_data->>'ref') ~ '^[0-9a-f-]{36}$' then
+    select id into ref from profiles where id = (new.raw_user_meta_data->>'ref')::uuid;
+  end if;
+  insert into profiles (id, full_name, phone, role, referred_by)
+  values (new.id, coalesce(new.raw_user_meta_data->>'full_name', ''), new.raw_user_meta_data->>'phone',
+          case when new.raw_user_meta_data->>'role' = 'supplier' then 'supplier'::user_role else 'shop_owner'::user_role end,
+          ref);
+  return new;
+end $$;
+create or replace function my_invites() returns int
+language sql stable security definer set search_path = public as $$
+  select count(*)::int from profiles where referred_by = auth.uid();
+$$;
+revoke execute on function my_invites() from public, anon;
+grant  execute on function my_invites() to authenticated;
+
+-- أسعار حسب الكمية
+create table if not exists product_tiers (
+  product_id uuid not null references products(id) on delete cascade,
+  min_qty int not null check (min_qty > 1),
+  price numeric(12,2) not null check (price > 0),
+  primary key (product_id, min_qty)
+);
+-- عروض بمدة محددة
+create table if not exists promos (
+  product_id uuid primary key references products(id) on delete cascade,
+  price numeric(12,2) not null check (price > 0),
+  until timestamptz not null
+);
+alter table product_tiers enable row level security;
+alter table promos        enable row level security;
+drop policy if exists "tiers read" on product_tiers;
+create policy "tiers read" on product_tiers for select using (true);
+drop policy if exists "tiers owner" on product_tiers;
+create policy "tiers owner" on product_tiers for all
+  using (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()))
+  with check (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()));
+drop policy if exists "promos read" on promos;
+create policy "promos read" on promos for select using (true);
+drop policy if exists "promos owner" on promos;
+create policy "promos owner" on promos for all
+  using (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()))
+  with check (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()));
