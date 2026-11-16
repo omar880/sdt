@@ -918,3 +918,280 @@ drop policy if exists "promos owner" on promos;
 create policy "promos owner" on promos for all
   using (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()))
   with check (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()));
+
+
+-- ============================================================
+-- v1.7 — أرقام واتساب بعد الدخول، شحن، مورد مؤسس، تيليغرام، سجل الطلبات
+-- ============================================================
+alter table stores
+  add column if not exists shipping_companies text check (char_length(shipping_companies) <= 150),
+  add column if not exists founder boolean not null default false,
+  add column if not exists telegram_chat_id bigint,
+  add column if not exists telegram_code text not null default substr(replace(gen_random_uuid()::text, '-', ''), 1, 12);
+create unique index if not exists stores_telegram_code on stores (telegram_code);
+
+-- الرقم يظهر للمسجّلين فقط (يعود null للزائر)
+create or replace view products_public with (security_invoker = false) as
+select p.id, p.name, p.description, p.carton_price, p.unit_price, p.units_per_carton,
+       p.min_qty_cartons, p.stock_cartons, p.category_id, p.created_at,
+       s.id as store_id, s.name as store_name, s.logo_url, s.wilaya_id as store_wilaya_id,
+       case when auth.uid() is not null then s.whatsapp_phone end as whatsapp_phone,
+       (select url from product_images i where i.product_id = p.id order by sort limit 1) as image_url,
+       p.price_updated_at
+from products p join stores s on s.id = p.store_id
+where p.is_active and not p.is_hidden_by_admin and s.status = 'approved'
+  and not s.is_paused and not is_blocked_user(s.owner_id);
+grant select on products_public to anon, authenticated;
+
+create or replace view stores_public with (security_invoker = false) as
+select s.id, s.name, s.description, s.logo_url, s.wilaya_id, s.address,
+       case when auth.uid() is not null then s.whatsapp_phone end as whatsapp_phone,
+       s.created_at, s.verified, s.facebook, s.instagram, s.hours, s.delivery_fee,
+       s.delivery_days, s.min_order, s.shipping_companies, s.founder
+from stores s
+where s.status = 'approved' and not s.is_paused and not is_blocked_user(s.owner_id);
+grant select on stores_public to anon, authenticated;
+
+-- مورد مؤسس: أول 50 متجراً يُعتمد تلقائياً، ولا يستطيع المورد تغييرها
+create or replace function founder_guard() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' then new.founder := false; return new; end if;
+  if new.founder is distinct from old.founder and auth.uid() is not null and not is_admin() then
+    new.founder := old.founder; end if;
+  if new.status = 'approved' and old.status is distinct from 'approved' and not new.founder
+     and (select count(*) from stores where founder) < 50 then
+    new.founder := true; end if;
+  return new;
+end $$;
+drop trigger if exists trg_founder on stores;
+create trigger trg_founder before insert or update on stores for each row execute function founder_guard();
+
+-- إعدادات عامة (مثل: free_until) — يكتبها المدير فقط
+create table if not exists site_settings (key text primary key, value text);
+alter table site_settings enable row level security;
+drop policy if exists "settings read" on site_settings;
+create policy "settings read" on site_settings for select using (true);
+drop policy if exists "settings admin" on site_settings;
+create policy "settings admin" on site_settings for all using (is_admin()) with check (is_admin());
+
+-- سجل الطلبات
+create table if not exists orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id) on delete cascade,
+  store_id uuid references stores(id) on delete set null,
+  store_name text not null,
+  items jsonb not null check (jsonb_typeof(items) = 'array' and jsonb_array_length(items) between 1 and 100),
+  total numeric not null default 0,
+  created_at timestamptz not null default now()
+);
+create index if not exists orders_user on orders (user_id, created_at desc);
+alter table orders enable row level security;
+drop policy if exists "orders own" on orders;
+create policy "orders own" on orders for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+drop policy if exists "orders admin" on orders;
+create policy "orders admin" on orders for select using (is_admin());
+
+-- تيليغرام: أسرار لا يقرؤها أحد من المتصفح (RLS بلا سياسات)
+create extension if not exists pg_net;
+create table if not exists app_secrets (key text primary key, value text not null);
+alter table app_secrets enable row level security;
+revoke all on app_secrets from anon, authenticated;
+
+create or replace function tg_send(p_store uuid, p_text text) returns void
+language plpgsql security definer set search_path = public as $$
+declare tok text; chat bigint;
+begin
+  select telegram_chat_id into chat from stores where id = p_store;
+  select value into tok from app_secrets where key = 'tg_token';
+  if chat is null or tok is null then return; end if;
+  begin
+    perform net.http_post(url := 'https://api.telegram.org/bot' || tok || '/sendMessage',
+      headers := '{"Content-Type":"application/json"}'::jsonb,
+      body := jsonb_build_object('chat_id', chat, 'text', p_text));
+  exception when others then null;
+  end;
+end $$;
+revoke execute on function tg_send(uuid, text) from public, anon, authenticated;
+
+create or replace function notify_order() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform tg_send(new.store_id, '🛒 طلبية جديدة' || E'\n' ||
+    (select string_agg('• ' || (i->>'n') || ' × ' || (i->>'q') || ' كرتونة', E'\n') from jsonb_array_elements(new.items) i));
+  return new;
+end $$;
+drop trigger if exists trg_notify_order on orders;
+create trigger trg_notify_order after insert on orders for each row execute function notify_order();
+
+create or replace function notify_click() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  perform tg_send(new.store_id, '🔔 اهتمام جديد بمنتجك: ' || coalesce((select name from products where id = new.product_id), ''));
+  return new;
+end $$;
+drop trigger if exists trg_notify_click on whatsapp_clicks;
+create trigger trg_notify_click after insert on whatsapp_clicks for each row execute function notify_click();
+
+create or replace function link_telegram(p_code text, p_chat bigint, p_secret text) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  if p_secret is distinct from (select value from app_secrets where key = 'tg_secret') then return false; end if;
+  update stores set telegram_chat_id = p_chat where telegram_code = p_code;
+  return found;
+end $$;
+revoke execute on function link_telegram(text, bigint, text) from public;
+grant  execute on function link_telegram(text, bigint, text) to anon, authenticated;
+
+-- بعد إنشاء البوت نفّذ (غيّر القيمتين):
+--   insert into app_secrets values ('tg_token','123456:ABC...'), ('tg_secret','كلمة_سرية_طويلة_حروف_وأرقام');
+-- ولإظهار لافتة "مجاني حتى":
+--   insert into site_settings values ('free_until','2027-06-30');
+
+
+-- ============================================================
+-- v1.8 — خيارات المنتج، حالة الطلب وتتبع الشحن، الطلبات الواردة للمورد
+-- ============================================================
+create table if not exists product_extras (
+  product_id uuid primary key references products(id) on delete cascade,
+  options text not null check (char_length(options) between 1 and 200)
+);
+alter table product_extras enable row level security;
+drop policy if exists "extras read" on product_extras;
+create policy "extras read" on product_extras for select using (true);
+drop policy if exists "extras owner" on product_extras;
+create policy "extras owner" on product_extras for all
+  using (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()))
+  with check (is_active_supplier() and exists (select 1 from products p join stores s on s.id = p.store_id where p.id = product_id and s.owner_id = auth.uid()));
+
+alter table orders
+  add column if not exists status text not null default 'new' check (status in ('new','shipped','delivered','canceled')),
+  add column if not exists tracking text check (char_length(tracking) <= 60),
+  add column if not exists buyer_name text check (char_length(buyer_name) <= 100);
+
+-- التاجر يقرأ ويُنشئ طلباته فقط (لا يغيّر الحالة بنفسه)؛ المورد يرى طلبات متجره
+drop policy if exists "orders own" on orders;
+drop policy if exists "orders own read" on orders;
+drop policy if exists "orders own insert" on orders;
+drop policy if exists "orders supplier" on orders;
+create policy "orders own read" on orders for select using (user_id = auth.uid());
+create policy "orders own insert" on orders for insert with check (user_id = auth.uid() and status = 'new' and tracking is null);
+create policy "orders supplier" on orders for select using (
+  exists (select 1 from stores s where s.id = orders.store_id and s.owner_id = auth.uid()));
+
+create or replace function set_order_status(p_id uuid, p_status text, p_tracking text) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if p_status not in ('new','shipped','delivered','canceled') then raise exception 'حالة غير صالحة'; end if;
+  update orders o set status = p_status, tracking = nullif(left(p_tracking, 60), '')
+   where o.id = p_id
+     and exists (select 1 from stores s where s.id = o.store_id and s.owner_id = auth.uid());
+  if not found then raise exception 'غير مسموح'; end if;
+end $$;
+revoke execute on function set_order_status(uuid, text, text) from public, anon;
+grant  execute on function set_order_status(uuid, text, text) to authenticated;
+
+
+-- ============================================================
+-- v1.9 — أكواد الخصم + تاريخ تغيّر السعر
+-- ============================================================
+create table if not exists discount_codes (
+  store_id uuid not null references stores(id) on delete cascade,
+  code text not null check (code ~ '^[A-Z0-9]{3,20}$'),
+  percent smallint not null check (percent between 1 and 50),
+  expires_at timestamptz,
+  primary key (store_id, code)
+);
+alter table discount_codes enable row level security;
+drop policy if exists "codes owner" on discount_codes;
+create policy "codes owner" on discount_codes for all
+  using (is_active_supplier() and exists (select 1 from stores s where s.id = store_id and s.owner_id = auth.uid()))
+  with check (is_active_supplier() and exists (select 1 from stores s where s.id = store_id and s.owner_id = auth.uid()));
+
+create or replace function check_code(p_store uuid, p_code text) returns smallint
+language sql stable security definer set search_path = public as $$
+  select percent from discount_codes
+   where store_id = p_store and code = upper(trim(p_code)) and (expires_at is null or expires_at > now());
+$$;
+revoke execute on function check_code(uuid, text) from public, anon;
+grant  execute on function check_code(uuid, text) to authenticated;
+
+create table if not exists price_history (
+  id bigint generated always as identity primary key,
+  product_id uuid not null references products(id) on delete cascade,
+  price numeric(12,2) not null,
+  changed_at timestamptz not null default now()
+);
+create index if not exists price_history_p on price_history (product_id, changed_at desc);
+alter table price_history enable row level security;
+drop policy if exists "history read" on price_history;
+create policy "history read" on price_history for select using (true);
+
+create or replace function touch_price() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.carton_price is distinct from old.carton_price then
+    new.price_updated_at := now();
+    insert into price_history (product_id, price) values (new.id, new.carton_price);
+  end if;
+  return new;
+end $$;
+
+
+-- ============================================================
+-- v2.0 — إشعارات انخفاض السعر (داخل الموقع) + ملخص أسبوعي عبر تيليغرام
+-- ============================================================
+create table if not exists notifications (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references profiles(id) on delete cascade,
+  product_id uuid references products(id) on delete cascade,
+  text text not null,
+  is_read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists notifications_user on notifications (user_id, created_at desc);
+alter table notifications enable row level security;
+drop policy if exists "notes read" on notifications;
+create policy "notes read" on notifications for select using (user_id = auth.uid());
+drop policy if exists "notes update" on notifications;
+create policy "notes update" on notifications for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- عند خفض السعر: تنبيه لكل من أضاف المنتج إلى مفضلته
+create or replace function touch_price() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.carton_price is distinct from old.carton_price then
+    new.price_updated_at := now();
+    insert into price_history (product_id, price) values (new.id, new.carton_price);
+    if new.carton_price < old.carton_price then
+      insert into notifications (user_id, product_id, text)
+      select f.user_id, new.id, '📉 انخفض سعر «' || new.name || '» إلى ' || new.carton_price || ' دج للكرتونة'
+      from favorites f where f.product_id = new.id;
+    end if;
+  end if;
+  return new;
+end $$;
+
+-- ملخص أسبوعي لكل مورد ربط تيليغرام (يعمل بعد تفعيل البوت وpg_cron)
+create or replace function send_weekly_digest() returns void
+language plpgsql security definer set search_path = public as $$
+declare r record;
+begin
+  for r in
+    select s.id,
+      (select count(*) from whatsapp_clicks c where c.store_id = s.id and c.created_at > now() - interval '7 days') as clicks,
+      (select count(*) from orders o where o.store_id = s.id and o.created_at > now() - interval '7 days') as ords
+    from stores s where s.telegram_chat_id is not null and s.status = 'approved'
+  loop
+    perform tg_send(r.id, '📊 ملخص أسبوعك في سوق الجملة' || E'\n' ||
+      'نقرات واتساب: ' || r.clicks || E'\n' || 'طلبيات من السلة: ' || r.ords);
+  end loop;
+end $$;
+revoke execute on function send_weekly_digest() from public, anon, authenticated;
+
+do $$ begin
+  create extension if not exists pg_cron;
+  perform cron.schedule('weekly-digest', '0 7 * * 6', 'select public.send_weekly_digest()');
+exception when others then
+  raise notice 'pg_cron غير مفعّل: فعّله من Database ثم Extensions ثم أعد تشغيل هذا القسم';
+end $$;

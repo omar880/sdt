@@ -9,78 +9,2472 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
 <style>
-:root{--bg:#121212;--card:#1c1c1e;--line:#2c2c30;--txt:#f2f2f3;--mut:#a5a5ad;--acc:#4a86f7;--accd:#2f6be0;--wa:#25d366;--wat:#06361a;box-sizing:border-box}
-@media (prefers-color-scheme:light){:root{--bg:#f4f5f7;--card:#fff;--line:#dfe1e6;--txt:#17181a;--mut:#5b5f68;--acc:#2160e8;--accd:#1a4fc2}}
+/* Design tokens — Minimalism & Swiss + professional blue (ui-ux-pro-max: B2B marketplace) */
+:root{--bg:#0f1115;--card:#171a20;--card2:#1d2128;--line:#272c35;--txt:#f2f3f5;--mut:#a3a9b5;--acc:#6b9bff;--accd:#2457c9;--btn:#2f6be0;--btnh:#2457c9;--wa:#25d366;--wat:#06361a;--ok:#34d399;--danger:#ff7b7b;--r:12px;--r2:18px;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25);--hero1:#10307f;--hero2:#2457c9;box-sizing:border-box;color-scheme:dark light}
+@media (prefers-color-scheme:light){:root{--bg:#f5f7fa;--card:#fff;--card2:#f0f3f8;--line:#e2e6ed;--txt:#12161c;--mut:#566070;--acc:#1f5bdc;--btn:#1f5bdc;--btnh:#1748b0;--ok:#157a4a;--danger:#c62828;--shadow:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.08)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font:400 15px/1.6 Cairo,Tahoma,sans-serif}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--txt);font:400 15px/1.7 Cairo,Tahoma,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0)}
 a{color:inherit;text-decoration:none}
-.w{max-width:1100px;margin:auto;padding:0 16px}
-header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
-header .w{display:flex;align-items:center;gap:16px;height:56px}
-.logo{font-weight:700;font-size:19px;color:var(--acc)}
-nav{display:flex;gap:14px;margin-inline-start:auto;font-size:14px;color:var(--mut);align-items:center}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:600 14px Cairo,sans-serif;cursor:pointer}
-.btn:hover{background:var(--accd)}.btn.wa{background:var(--wa);color:var(--wat)}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}.btn.red{background:#d33}.btn.sm{min-height:34px;padding:0 12px;font-size:13px}
-input,select,textarea{min-height:44px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:8px 12px;font:400 15px Cairo,sans-serif;max-width:100%;width:100%}
-input:focus,select:focus,textarea:focus,.btn:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.w{max-width:1120px;margin:auto;padding:0 16px}
+.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.ic.sm{width:16px;height:16px}.ic.lg{width:28px;height:28px}
+/* header */
+header{position:sticky;top:0;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line);z-index:5;padding-top:env(safe-area-inset-top,0)}
+header .w{display:flex;align-items:center;gap:14px;min-height:60px;flex-wrap:wrap}
+.logo{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:19px;color:var(--txt);min-height:44px}
+.logo .mk{width:32px;height:32px;border-radius:9px;background:var(--btn);color:#fff;display:grid;place-items:center}
+.logo .mk .ic{width:18px;height:18px}
+nav.links{display:flex;gap:2px;font-size:14px;color:var(--mut);align-items:center;margin-inline-start:12px}
+nav.links a{padding:8px 12px;border-radius:9px;min-height:40px;display:inline-flex;align-items:center;transition:background-color .18s,color .18s;white-space:nowrap}
+nav.links a:hover{background:var(--card2);color:var(--txt)}
+nav.links a[aria-current=page]{color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent);font-weight:600}
+.act{display:flex;align-items:center;gap:4px;margin-inline-start:auto;font-size:14px;color:var(--mut)}
+.act a,.act #ct{display:inline-flex;align-items:center;gap:5px;min-height:44px;min-width:44px;justify-content:center;padding:0 10px;border-radius:10px;transition:background-color .18s,color .18s;position:relative;white-space:nowrap}
+.act a:hover{background:var(--card2);color:var(--txt)}
+.act .btn{color:#fff}.act .btn:hover{background:var(--btnh);color:#fff}
+.cnt{min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--btn);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+/* controls */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 18px;border:0;border-radius:var(--r);background:var(--btn);color:#fff;font:600 14px Cairo,sans-serif;cursor:pointer;transition:background-color .18s,transform .12s,box-shadow .18s}
+.btn:hover{background:var(--btnh)}.btn:active{transform:scale(.98)}
+.btn.wa{background:var(--wa);color:var(--wat)}.btn.wa:hover{background:#3ae07c}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}.btn.ghost:hover{background:var(--card2)}
+.btn.red{background:#c62828}.btn.sm{min-height:40px;padding:0 14px;font-size:13px}
+input,select,textarea{min-height:44px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);color:var(--txt);padding:8px 12px;font:400 15px Cairo,sans-serif;max-width:100%;width:100%;transition:border-color .18s,box-shadow .18s}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--acc) 45%,var(--line))}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px;border-color:var(--acc)}
 label{font-size:13px;color:var(--mut);display:block}
-.hero{padding:36px 0 20px;text-align:center}.hero h1{font-size:clamp(24px,6vw,36px);margin:0 0 8px;line-height:1.3}
-.sb{display:flex;flex-wrap:wrap;gap:8px;max-width:720px;margin:20px auto 0}.sb input{flex:1 1 220px;width:auto}.sb select{flex:1 1 150px;width:auto}
-h2{font-size:20px;margin:30px 0 14px}.mut{color:var(--mut);font-size:13px}.ok{color:var(--wa)}.no{color:#ff6b6b}
-.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
-.cat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;font-size:13px}
-.cat b{display:block;font-size:28px;font-weight:400}
-.grid,.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-.card,.box{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.card{display:flex;flex-direction:column}.box{padding:16px;margin-bottom:14px}
-.img{height:130px;display:grid;place-items:center;font-size:50px;background:var(--line);overflow:hidden}
-.img img{width:100%;height:100%;object-fit:cover}.img.big{height:300px;border-radius:14px}
-.th{display:flex;gap:6px;margin-top:6px}.th img{width:56px;height:56px;object-fit:cover;border-radius:8px;cursor:pointer}
-.cb{padding:12px;display:flex;flex-direction:column;gap:4px}.cb h3{margin:0;font-size:16px}
-.price{color:var(--acc);font-weight:700;font-size:17px}
-.store{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:center}
-.av{width:52px;height:52px;border-radius:12px;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:22px;flex:none;overflow:hidden}
+/* hero banner — Geometric (banner-design), website hero, safe-zone content */
+.hero{position:relative;overflow:hidden;isolation:isolate;margin-top:18px;padding:clamp(28px,5vw,56px) clamp(20px,5vw,56px);border-radius:var(--r2) ;background:linear-gradient(135deg,var(--hero1),var(--hero2));color:#fff;text-align:start}
+.hero .art{position:absolute;inset-block:0;inset-inline-end:0;width:min(40%,440px);height:100%;z-index:-1;opacity:.95}
+.hero .in{max-width:560px}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);margin-bottom:14px}
+.hero h1{font-size:clamp(26px,5.2vw,42px);margin:0 0 10px;line-height:1.35;font-weight:700;letter-spacing:-.2px;text-wrap:balance}
+.hero p{margin:0;color:rgba(255,255,255,.92);font-size:clamp(14px,2.6vw,17px);max-width:52ch}
+.sb{display:flex;flex-wrap:wrap;gap:8px;max-width:640px;margin:24px 0 0;padding:8px;border-radius:calc(var(--r) + 6px);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+.sb input{flex:1 1 200px;width:auto;border-color:transparent}.sb select{flex:1 1 140px;width:auto;border-color:transparent}
+.sb .btn{background:#fff;color:#143a9c}.sb .btn:hover{background:#e8efff}
+.sb .btn .ic{width:18px;height:18px}
+.vp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0 0}
+.vp div{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.vp .vi{width:38px;height:38px;border-radius:10px;background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc);display:grid;place-items:center;flex:none}
+.vp b{display:block;font-size:14px;line-height:1.4}.vp span{font-size:13px;color:var(--mut);line-height:1.5}
+h2{font-size:21px;margin:36px 0 14px;font-weight:700;display:flex;align-items:center;gap:10px}
+h2::before{content:"";width:4px;height:20px;border-radius:4px;background:var(--btn)}
+.box h2,.hero h2,.fl h2{margin-top:0}
+.mut{color:var(--mut);font-size:13px}.ok{color:var(--ok)}.no{color:var(--danger)}
+/* categories */
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 8px 14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;min-height:44px;transition:border-color .18s,transform .18s,box-shadow .18s}
+.cat:hover{border-color:var(--acc);transform:translateY(-2px);box-shadow:var(--shadow)}
+.cat b{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 8px;border-radius:12px;background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);font-size:24px;font-weight:400;line-height:1}
+.cat b .ic{width:24px;height:24px}
+/* cards */
+.grid,.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card,.box{background:var(--card);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden}
+.card{display:flex;flex-direction:column;transition:border-color .18s,transform .18s,box-shadow .18s}
+.card:hover{border-color:color-mix(in srgb,var(--acc) 50%,var(--line));transform:translateY(-3px);box-shadow:var(--shadow)}
+.box{padding:18px;margin-bottom:14px}
+.img{aspect-ratio:4/3;height:auto;display:grid;place-items:center;font-size:50px;background:var(--card2);color:var(--mut);overflow:hidden}
+.img .ic{width:44px;height:44px;stroke-width:1.4;opacity:.7}
+.img img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.card:hover .img img{transform:scale(1.04)}
+.img.big{aspect-ratio:auto;height:320px;border-radius:var(--r2)}
+.th{display:flex;gap:8px;margin-top:8px}.th img{width:60px;height:60px;object-fit:cover;border-radius:10px;cursor:pointer;border:1px solid var(--line)}
+.cb{padding:14px;display:flex;flex-direction:column;gap:5px;flex:1}
+.cb h3{margin:0;font-size:16px;line-height:1.45;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cb h3 .fav{flex:none;min-height:44px;min-width:44px;margin:-8px;padding:0;font-size:18px;line-height:1;border-radius:99px;border-color:transparent;color:var(--danger)}
+.price{color:var(--acc);font-weight:700;font-size:18px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.price .promo{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px;background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--danger)}
+.cb a.mut{margin-top:auto;padding:6px 0;min-height:44px;display:flex;align-items:center;border-top:1px dashed var(--line)}
+.cb a.mut:hover{color:var(--acc)}
+/* stores */
+.store{background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:14px;display:flex;gap:12px;align-items:center;transition:border-color .18s,transform .18s,box-shadow .18s;min-height:44px}
+.store:hover{border-color:color-mix(in srgb,var(--acc) 50%,var(--line));transform:translateY(-2px);box-shadow:var(--shadow)}
+.store b{display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.4}
+.av{width:54px;height:54px;border-radius:14px;background:var(--btn);color:#fff;display:grid;place-items:center;font-size:22px;flex:none;overflow:hidden}
 .av img{width:100%;height:100%;object-fit:cover}
-.lay{display:grid;grid-template-columns:240px 1fr;gap:20px;margin-top:20px}
-.fl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;align-self:start}
-.pd{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px}
-.row{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0}
+.bdg{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--ok);line-height:1}
+.bdg.fd{color:#b7791f}
+@media (prefers-color-scheme:dark){.bdg.fd{color:#f5c56b}}
+.bdg .ic{width:16px;height:16px}
+/* layout pieces (unchanged structure) */
+.lay{display:grid;grid-template-columns:250px 1fr;gap:20px;margin-top:20px}
+.fl{background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:16px;display:flex;flex-direction:column;gap:10px;align-self:start}
+.pd{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:20px}
+.row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:9px 0}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form .f{grid-column:1/-1}
-.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;background:var(--line)}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;background:var(--card2);border:1px solid var(--line)}
+.tag.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,var(--line))}
 .stat{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
-.stat div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}.stat b{display:block;font-size:24px;color:var(--acc)}
+.stat div{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:center}.stat b{display:block;font-size:24px;color:var(--acc)}
 .tr{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
 details{margin:6px 0}.dws{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;max-height:200px;overflow:auto;margin-top:8px}
 .dws label{display:flex;gap:6px;align-items:center;color:var(--txt)}.dws input{width:auto;min-height:0}
-#toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;padding:10px 18px;border-radius:10px;z-index:9}
-footer{border-top:1px solid var(--line);margin-top:30px;padding:20px 0;color:var(--mut);font-size:13px;text-align:center}
-@media(max-width:760px){.lay,.pd,.form{grid-template-columns:1fr}.img.big{height:220px}}
-@media print{header,footer,.btn{display:none}body{background:#fff;color:#000}}</style>
+/* cta band + footer + toast */
+.cta{position:relative;overflow:hidden;isolation:isolate;text-align:center;margin-top:36px;padding:34px 20px;border-radius:var(--r2);background:var(--card);border:1px solid var(--line)}
+.cta::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(60% 120% at 50% 0,color-mix(in srgb,var(--acc) 16%,transparent),transparent 70%)}
+.cta h2{justify-content:center;margin:0}.cta h2::before{display:none}
+#toast{display:none;position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);color:#fff;padding:12px 20px;border-radius:var(--r);z-index:9;box-shadow:var(--shadow);max-width:calc(100vw - 32px);font-weight:600}
+footer{border-top:1px solid var(--line);margin-top:48px;padding:28px 0;color:var(--mut);font-size:13px}
+footer .fi{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+footer nav{display:flex;flex-wrap:wrap;gap:4px 16px}footer nav a{min-height:44px;display:inline-flex;align-items:center}footer nav a:hover{color:var(--acc)}
+.skip{position:absolute;inset-inline-start:8px;top:-60px;background:var(--btn);color:#fff;padding:10px 16px;border-radius:var(--r);z-index:20;transition:top .15s}.skip:focus{top:8px}
+@media(max-width:900px){.vp{grid-template-columns:1fr}.hero .art{opacity:.35;width:70%}}
+@media(max-width:760px){.lay,.pd,.form{grid-template-columns:1fr}.img.big{height:230px}
+ header .w{gap:6px 8px;padding-top:4px}
+ .logo{font-size:17px}
+ .act{max-width:calc(100% - 140px);overflow-x:auto;scrollbar-width:none}.act::-webkit-scrollbar{display:none}
+ nav.links{order:3;width:100%;margin:0 -4px;padding-bottom:6px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+ nav.links::-webkit-scrollbar{display:none}nav.links a{scroll-snap-align:start;background:var(--card);border:1px solid var(--line)}
+ .grid,.stores{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cb{padding:10px}.cb h3{font-size:14px}.price{font-size:16px}
+ .sb .btn{flex:1 1 100%}}
+@media(max-width:400px){.img{aspect-ratio:1/1}.cb h3{font-size:13.5px}.price{font-size:15px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;scroll-behavior:auto!important}.card:hover,.cat:hover,.store:hover{transform:none}}
+@media print{header,footer,.btn,.hero .art{display:none}body{background:#fff;color:#000}}</style>
 </head>
 <body>
-<header><div class="w"><a class="logo" href="#home">🏪 سوق الجملة</a><nav><a href="#products">المنتجات</a><a href="#stores">التجار</a><a href="#rfq">طلبات الأسعار</a><a href="#how">كيف يعمل</a><a href="#cart" id="ct">🛒</a><span id="au"></span></nav></div></header>
-<main class="w" id="app"></main>
-<footer><div class="w">© 2026 سوق الجملة – جميع الحقوق محفوظة</div></footer>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9 4.5 4h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.9-8-10.6A4.6 4.6 0 0 1 12 7a4.6 4.6 0 0 1 8 2.9c0 5.700-8 10.600-8 10.600z"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.500 3.400 8 8 9 4.600-1 8-4.500 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.500 14 7 22l5-3 5 3-1.500-8"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.700 7L4 20l1.100-4.200A8 8 0 1 1 21 12z"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="M4 20h16M7 20V10M12 20V4M17 20v-7"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></symbol>
+<symbol id="i-sparkle" viewBox="0 0 24 24"><path d="m12 3 1.900 5.100L19 10l-5.100 1.900L12 17l-1.900-5.100L5 10l5.100-1.900z"/></symbol>
+</defs></svg>
+<a class="skip" href="#app">تخطَّ إلى المحتوى</a>
+<header><div class="w"><a class="logo" href="#home" aria-label="سوق الجملة – الرئيسية"><span class="mk"><svg class="ic" aria-hidden="true"><use href="#i-store"/></svg></span>سوق الجملة</a><nav class="links" aria-label="التنقل الرئيسي"><a href="#products">المنتجات</a><a href="#stores">التجار</a><a href="#market">أسعار السوق</a><a href="#suppliers">للموردين</a><a href="#rfq">طلبات الأسعار</a><a href="#how">كيف يعمل</a></nav><div class="act"><a href="#cart" id="ct" aria-label="السلة"><svg class="ic" aria-hidden="true"><use href="#i-cart"/></svg></a><span id="au"></span></div></div></header>
+<main class="w" id="app" tabindex="-1"></main>
+<footer><div class="w fi"><span>© 2026 سوق الجملة – جميع الحقوق محفوظة</span><nav aria-label="روابط سريعة"><a href="#products">المنتجات</a><a href="#stores">التجار</a><a href="#suppliers">للموردين</a><a href="#how">كيف يعمل</a></nav></div></footer>
 <div id="toast"></div>
 <script>
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+</script>
+<script>
 /* ====== 1) ضع بيانات مشروعك من Supabase → Project Settings → API ====== */
-const SB_URL="https://yykjuyakbzzrwjajqpya.supabase.co", SB_KEY="sb_publishable_n7H2lHuEUx5GdLd1KSTzrw_NXIOZ8Ue";
+const SB_URL="PASTE_SUPABASE_URL_HERE", SB_KEY="PASTE_ANON_KEY_HERE";
 if(top!==self){try{top.location=self.location}catch(e){document.documentElement.innerHTML=""}}   // anti-clickjacking
 /* ======================================================================= */
+const ic=(n,c)=>`<svg class="ic${c?" "+c:""}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const $=s=>document.querySelector(s),app=h=>$("#app").innerHTML=h,go=h=>location.hash=h;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fm=n=>Number(n).toLocaleString("fr-FR")+" دج";
 const msg=(t,ok)=>{const e=$("#toast");e.textContent=t;e.style.background=ok?"#1a9c4e":"#d33";e.style.display="block";setTimeout(()=>e.style.display="none",3500)};
-let db,W=[],C=[],me=null,prof=null,f={q:"",w:"",c:"",p:"",s:"new"},cache=[],FV=new Set(),PCUR=null,PROMO={};
+let db,W=[],C=[],me=null,prof=null,f={q:"",w:"",c:"",p:"",s:"new"},cache=[],FV=new Set(),PCUR=null,PROMO={},FREE=null;
 const wn=id=>(W.find(w=>w.id==id)||{}).name_ar||"",wnh=id=>esc(wn(id));
 const opts=(sel,all)=>(all!=null?`<option value="">${all}</option>`:"")+W.map(w=>`<option value="${w.id}"${sel!==""&&sel!=null&&+sel===w.id?" selected":""}>${w.id} – ${esc(w.name_ar)}</option>`).join("");
 const copts=sel=>C.map(c=>`<option value="${c.id}"${sel==c.id?" selected":""}>${esc(c.name_ar)}</option>`).join("");
 const norm=p=>{p=String(p).replace(/\D/g,"");return p.startsWith("0")?"213"+p.slice(1):p};
 const ST={pending:"قيد المراجعة",approved:"معتمد",suspended:"موقوف"};
 const img=u=>u&&String(u).startsWith(SB_URL.replace(/\/+$/,"")+"/storage/")?`<img loading="lazy" src="${esc(u)}" alt="">`:"";
-const card=p=>`<div class="card"><a href="#product-${p.id}"><div class="img">${p.image_url?img(p.image_url):"📦"}</div></a><div class="cb"><h3>${esc(p.name)} <button class="btn ghost sm" data-act="fav" data-id="${p.id}" aria-label="مفضلة" style="min-height:26px;padding:0 8px">${FV.has(p.id)?"♥":"♡"}</button></h3><span class="price">${PROMO[p.id]?"🔥 "+fm(PROMO[p.id]):fm(p.carton_price)} <span class="mut">/ كرتونة</span></span><span class="mut">القطعة: ${fm(p.unit_price)} · الحد الأدنى: ${p.min_qty_cartons}</span><a class="mut" href="#store-${p.store_id}">${esc(p.store_name)} – ${wnh(p.store_wilaya_id)}</a></div></div>`;
-const storeCard=s=>`<a class="store" href="#store-${s.id}"><div class="av">${s.logo_url?img(s.logo_url):"🏬"}</div><div><b>${esc(s.name)}${s.verified?" ✅":""}</b><div class="mut">${wnh(s.wilaya_id)}</div></div></a>`;
+const card=p=>`<div class="card"><a href="#product-${p.id}"><div class="img">${p.image_url?img(p.image_url):ic("box")}</div></a><div class="cb"><h3><span>${esc(p.name)}</span><button class="btn ghost fav" data-act="fav" data-id="${p.id}" aria-label="إضافة إلى المفضلة">${FV.has(p.id)?"♥":"♡"}</button></h3><span class="price">${PROMO[p.id]?`<span class="promo">${ic("flame","sm")}عرض</span>`+fm(PROMO[p.id]):fm(p.carton_price)} <span class="mut">/ كرتونة</span></span><span class="mut">القطعة: ${fm(p.unit_price)} · الحد الأدنى: ${p.min_qty_cartons}</span><a class="mut" href="#store-${p.store_id}">${esc(p.store_name)} – ${wnh(p.store_wilaya_id)}</a></div></div>`;
+const storeCard=s=>`<a class="store" href="#store-${s.id}"><div class="av">${s.logo_url?img(s.logo_url):ic("store","lg")}</div><div><b>${esc(s.name)}${s.verified?`<span class="bdg" title="مورد موثّق">${ic("shield")}موثّق</span>`:""}${s.founder?`<span class="bdg fd" title="مورد مؤسس">${ic("award")}مؤسس</span>`:""}</b><div class="mut">${wnh(s.wilaya_id)}</div></div></a>`;
 async function webp(file){const bm=await createImageBitmap(file),k=Math.min(1,1200/Math.max(bm.width,bm.height)),c=document.createElement("canvas");c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);return new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(new Error("تعذّر ضغط الصورة")),"image/webp",.8))}
 async function up(bucket,file){if(!/^image\/(jpeg|png|webp)$/.test(file.type)||file.size>1e7)throw new Error("الصور (JPG/PNG/WebP) فقط وبحجم أقل من 10 ميغا");
  const b=await webp(file),path=`${me.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.webp`;
@@ -93,50 +2487,51 @@ async function boot(){
  let k=null;try{k=JSON.parse(localStorage.getItem("ref"))}catch(e){}
  const fresh=k&&Date.now()-k.t<864e5&&k.W?.length&&k.C?.length;
  const [w,c,s]=await Promise.all([fresh?{data:k.W}:db.from("wilayas").select().order("id"),fresh?{data:k.C}:db.from("categories").select().order("sort"),db.auth.getSession()]);
- W=w.data||[];C=c.data||[];if(!fresh&&W.length&&C.length)try{localStorage.setItem("ref",JSON.stringify({t:Date.now(),W,C}))}catch(e){}try{const r=new URLSearchParams(location.search).get("ref");if(r&&/^[0-9a-f-]{36}$/.test(r))localStorage.setItem("inv",r)}catch(e){}await setUser(s.data.session);await loadPromo();
+ W=w.data||[];C=c.data||[];if(!fresh&&W.length&&C.length)try{localStorage.setItem("ref",JSON.stringify({t:Date.now(),W,C}))}catch(e){}try{const r=new URLSearchParams(location.search).get("ref");if(r&&/^[0-9a-f-]{36}$/.test(r))localStorage.setItem("inv",r)}catch(e){}await setUser(s.data.session);await loadPromo();try{const {data:fs}=await db.from("site_settings").select("value").eq("key","free_until").maybeSingle();FREE=fs?.value||null}catch(e){}
  db.auth.onAuthStateChange((ev,s)=>{setTimeout(()=>setUser(s),0);if(ev==="PASSWORD_RECOVERY")setTimeout(()=>go("profile"),50)});
  addEventListener("hashchange",route);route()}
 async function setUser(s){me=s?.user||null;prof=me?(await db.from("profiles").select().eq("id",me.id).maybeSingle()).data:null;FV=new Set(me?((await db.from("favorites").select("product_id")).data||[]).map(x=>x.product_id):[]);
- $("#au").innerHTML=me?`${prof?.role==="admin"?'<a href="#admin">الإدارة</a> ':''}${prof?.role==="supplier"?'<a href="#dash">لوحتي</a> ':''}<a href="#favs">♥</a> <a href="#profile">حسابي</a> <a href="#home" id="lo">خروج</a>`:'<a class="btn sm" href="#auth">دخول / تسجيل</a>';
+ $("#au").innerHTML=me?`${prof?.role==="admin"?'<a href="#admin">الإدارة</a>':''}${prof?.role==="supplier"?'<a href="#dash">لوحتي</a>':''}<a href="#favs" aria-label="المفضلة">${ic("heart")}</a><a href="#notes" id="bell" aria-label="الإشعارات">${ic("bell")}</a><a href="#orders">طلباتي</a><a href="#profile">حسابي</a><a href="#home" id="lo">خروج</a>`:'<a class="btn sm" href="#auth">دخول / تسجيل</a>';
  const lo=$("#lo");if(lo)lo.onclick=()=>db.auth.signOut()}
-const R={home,products,stores,auth,dash,admin,profile,favs,cart,how,rfq};
-async function route(){cartN();const h=location.hash.slice(1)||"home",i=h.indexOf("-"),a=i<0?h:h.slice(0,i),b=i<0?"":h.slice(i+1);
+const R={home,products,stores,auth,dash,admin,profile,favs,cart,how,rfq,orders,suppliers,market,notes};
+async function route(){cartN();bell();const h=location.hash.slice(1)||"home",i=h.indexOf("-"),a=i<0?h:h.slice(0,i),b=i<0?"":h.slice(i+1);
  app('<p class="mut" style="padding:40px;text-align:center">جارٍ التحميل…</p>');
- try{if(a==="product")await product(b);else if(a==="store")await store(b);else if(a==="catalog")await catalog(b);else await(R[a]||home)()}catch(e){app(`<p class="no" style="padding:30px">حدث خطأ: ${esc(e.message)}</p>`)}scrollTo(0,0)}
+ try{if(a==="product")await product(b);else if(a==="store")await store(b);else if(a==="catalog")await catalog(b);else if(a==="quick")await quick(b);else if(a==="qr")qr(b);else await(R[a]||home)()}catch(e){app(`<p class="no" style="padding:30px">حدث خطأ: ${esc(e.message)}</p>`)}scrollTo(0,0)}
 
 /* ---------- public pages ---------- */
 async function home(){
- app(`<section class="hero"><h1>كل موردي الجملة في الجزائر في مكان واحد</h1><p class="mut">قارن الأسعار وتواصل مع التاجر مباشرة عبر واتساب</p><div class="sb"><input id="q" placeholder="ابحث عن منتج أو مورد..." aria-label="بحث"><select id="w" aria-label="الولاية">${opts("","كل الولايات ("+W.length+")")}</select><button class="btn" id="go">بحث</button></div></section>
- <h2>التصنيفات</h2><div class="cats">${C.map(c=>`<div class="cat" data-c="${c.id}" role="button" tabindex="0"><b>${esc(c.icon||"📦")}</b>${esc(c.name_ar)}</div>`).join("")}</div>
+ app(`<section class="hero" aria-labelledby="h1"><svg class="art" viewBox="0 0 520 360" preserveAspectRatio="xMaxYMid slice" aria-hidden="true" focusable="false"><defs><pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.600" fill="#fff" fill-opacity=".22"/></pattern><linearGradient id="fa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset="1" stop-color="#fff" stop-opacity=".08"/></linearGradient></defs><rect width="520" height="360" fill="url(#dots)"/><g stroke="#fff" stroke-opacity=".55" stroke-width="1.500" stroke-linejoin="round"><path d="M360 70 440 112v92l-80 42-80-42v-92z" fill="url(#fa)"/><path d="M280 112 360 154 440 112M360 154v92" fill="none"/><path d="M200 214 258 244v66l-58 30-58-30v-66z" fill="url(#fa)"/><path d="M142 244 200 274 258 244M200 274v66" fill="none"/><path d="M470 232 510 252v46l-40 21-40-21v-46z" fill="url(#fa)"/><path d="M430 252 470 273 510 252M470 273v46" fill="none"/></g><circle cx="400" cy="40" r="46" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.500"/><circle cx="400" cy="40" r="26" fill="#fff" fill-opacity=".10"/></svg><div class="in"><span class="eyebrow">${ic("sparkle","sm")}منصة الجملة الجزائرية</span><h1 id="h1">كل موردي الجملة في الجزائر في مكان واحد</h1><p>قارن الأسعار وتواصل مع التاجر مباشرة عبر واتساب</p><div class="sb" role="search"><input id="q" placeholder="ابحث عن منتج أو مورد..." aria-label="بحث"><select id="w" aria-label="الولاية">${opts("","كل الولايات ("+W.length+")")}</select><button class="btn" id="go">${ic("search")}بحث</button></div></div></section>
+ <div class="vp"><div><span class="vi">${ic("scale")}</span><p style="margin:0"><b>قارن الأسعار</b><span>أسعار الكرتونة والقطعة لدى عدة موردين</span></p></div><div><span class="vi">${ic("chat")}</span><p style="margin:0"><b>تواصل مباشر</b><span>اطلب من التاجر عبر واتساب بدون وسيط</span></p></div><div><span class="vi">${ic("map")}</span><p style="margin:0"><b>كل الولايات</b><span>موردون من ${W.length||58} ولاية وتوصيل حسب المورد</span></p></div></div>
+ <h2>التصنيفات</h2><div class="cats">${C.map(c=>`<div class="cat" data-c="${c.id}" role="button" tabindex="0"><b>${c.icon?esc(c.icon):ic("box")}</b>${esc(c.name_ar)}</div>`).join("")}</div>
  <h2>أحدث المنتجات</h2><div class="grid" id="new"></div><h2>التجار</h2><div class="stores" id="ss"></div>
- <div class="box" style="text-align:center;margin-top:30px"><h2 style="margin:0">أنت تاجر جملة؟</h2><p class="mut">اعرض منتجاتك على أصحاب المحلات في كل الولايات.</p><a class="btn" href="#auth">سجّل الآن كمورد</a></div>`);
+ <div class="cta"><h2>أنت تاجر جملة؟</h2><p class="mut" style="margin:8px 0 16px">اعرض منتجاتك على أصحاب المحلات في كل الولايات.</p><a class="btn" href="#auth">سجّل الآن كمورد</a></div>`);
  const s=()=>{f.q=$("#q").value;f.w=$("#w").value;f.c="";go("products")};$("#go").onclick=s;$("#q").onkeydown=e=>e.key==="Enter"&&s();
- const [p,st]=await Promise.all([db.rpc("search_products",{lim:8}),db.from("stores_public").select("id,name,logo_url,wilaya_id,verified").limit(8)]);
+ const [p,st]=await Promise.all([db.rpc("search_products",{lim:8}),db.from("stores_public").select("id,name,logo_url,wilaya_id,verified,founder").limit(8)]);
  $("#new").innerHTML=(p.data||[]).map(card).join("")||'<p class="mut">لا توجد منتجات بعد.</p>';$("#ss").innerHTML=(st.data||[]).map(storeCard).join("");
  try{const r=JSON.parse(localStorage.getItem("rv"))||[];if(r.length){const {data:rv}=await db.from("products_public").select().in("id",r);if(rv?.length)$("#new").previousElementSibling.insertAdjacentHTML("beforebegin",`<h2>شاهدتها مؤخراً</h2><div class="grid">${rv.map(card).join("")}</div>`)}}catch(e){}}
 async function products(){
  app(`<div class="lay"><aside class="fl"><div><label>بحث</label><input id="q" value="${esc(f.q)}"></div><div><label>الولاية (التوصيل إلى)</label><select id="w">${opts(f.w,"كل الولايات")}</select></div><div><label>التصنيف</label><select id="c"><option value="">الكل</option>${copts(f.c)}</select></div><div><label>أقصى سعر للكرتونة</label><input id="p" type="number" min="0" value="${esc(f.p)}"></div><div><label>الترتيب</label><select id="s">${[["new","الأحدث"],["cheap","الأرخص"],["exp","الأغلى"]].map(o=>`<option value="${o[0]}"${f.s===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select></div></aside><section><div class="mut" id="cnt"></div><div class="grid" id="res" style="margin-top:10px"></div><button class="btn ghost" id="more" style="display:none;margin:16px auto">عرض المزيد</button></section></div>`);
- let t=0,tm,off=0,shown=0;const N=24,r=async more=>{const k=++t;if(!more){off=0;shown=0}const {data,error}=await db.rpc("search_products",{q:f.q||null,delivers_to:f.w?+f.w:null,cat_id:f.c?+f.c:null,max_price:f.p?+f.p:null,lim:N,off,sort_by:f.s||"new"});if(k!==t)return;
+ let t=0,tm,off=0,shown=0;const N=24,r=async more=>{const k=++t,N2=nl(f.q||"");if(!more){off=0;shown=0}const {data,error}=await db.rpc("search_products",{q:N2.q||null,delivers_to:(N2.w||f.w)?+(N2.w||f.w):null,cat_id:f.c?+f.c:null,max_price:f.p?+f.p:null,lim:N,off,sort_by:f.s||"new"});if(k!==t)return;
   if(error)return $("#res").innerHTML=`<p class="no">${esc(error.message)}</p>`;shown+=data.length;off+=data.length;$("#cnt").textContent=shown+" منتج"+(data.length===N?"+":"");
   const x=data.map(card).join("");if(more)$("#res").insertAdjacentHTML("beforeend",x);else $("#res").innerHTML=x||'<p class="mut">لا توجد نتائج مطابقة.</p>';$("#more").style.display=data.length===N?"flex":"none"};
  ["q","w","c","p","s"].forEach(k=>$("#"+k).oninput=e=>{f[k]=e.target.value;clearTimeout(tm);tm=setTimeout(r,300)});$("#more").onclick=()=>r(true);r()}
 async function product(id){
  const {data:p}=await db.from("products_public").select().eq("id",id).maybeSingle();if(!p)return app('<p class="mut" style="padding:30px">المنتج غير موجود.</p>');
  const [{data:im},{data:dv}]=await Promise.all([db.from("product_images").select("url").eq("product_id",id).order("sort"),db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",p.store_id)]);
- PCUR=p;try{const r=JSON.parse(localStorage.getItem("rv"))||[];localStorage.setItem("rv",JSON.stringify([p.id,...r.filter(x=>x!==p.id)].slice(0,8)))}catch(e){}const [{data:tr0},{data:sd}]=await Promise.all([db.from("product_tiers").select("min_qty,price").eq("product_id",id).order("min_qty"),db.from("stores_public").select("delivery_fee,delivery_days,min_order").eq("id",p.store_id).maybeSingle()]);p.tr=tr0||[];const TR=p.tr;const ds=new Set((dv||[]).map(x=>x.wilaya_id)),im2=(im||[]).map(x=>x.url);
- app(`<p><a class="mut" href="#products">← العودة للمنتجات</a></p><div class="pd"><div><div class="img big" id="mi">${im2[0]?img(im2[0]):"📦"}</div><div class="th">${im2.length>1?im2.map(u=>`<img src="${esc(u)}" data-src="${esc(u)}" alt="">`).join(""):""}</div></div><div><h1 style="margin:0 0 6px">${esc(p.name)}</h1><p class="price" style="font-size:24px;margin:8px 0">${PROMO[p.id]?`<s class="mut">${fm(p.carton_price)}</s> 🔥 ${fm(PROMO[p.id])}`:fm(p.carton_price)} <span class="mut">/ كرتونة (${p.units_per_carton} قطعة)</span></p>
- <div class="row"><span>سعر القطعة</span><b>${fm(p.unit_price)}</b></div>${TR.map(t=>`<div class="row"><span>من ${t.min_qty} كرتونة</span><b>${fm(t.price)} / كرتونة</b></div>`).join("")}${sd&&(sd.delivery_fee!=null||sd.delivery_days)?`<div class="row"><span>التوصيل</span><b>${sd.delivery_fee===0?"مجاني":sd.delivery_fee!=null?fm(sd.delivery_fee):""}${sd.delivery_days?" · "+sd.delivery_days+" أيام":""}</b></div>`:""}${sd?.min_order?`<div class="row"><span>الحد الأدنى للطلبية</span><b>${fm(sd.min_order)}</b></div>`:""}<div class="row"><span>الحد الأدنى للطلب</span><b>${p.min_qty_cartons} كرتونة</b></div><div class="row"><span>آخر تحديث للسعر</span><b>${ago(p.price_updated_at)}</b></div><div class="row"><span>المخزون</span><b class="${p.stock_cartons?"ok":"no"}">${p.stock_cartons?p.stock_cartons+" كرتونة – متوفر":"غير متوفر"}</b></div><div class="row"><span>المورد</span><a href="#store-${p.store_id}"><b>${esc(p.store_name)}</b> – ${wnh(p.store_wilaya_id)}</a></div>
- <p>${esc(p.description||"")}</p><div style="display:flex;gap:8px;margin:14px 0"><input id="qt" type="number" min="${p.min_qty_cartons}" value="${p.min_qty_cartons}" style="width:90px" aria-label="الكمية"><select id="w" aria-label="الولاية">${opts(f.w,"اختر ولاية التوصيل")}</select></div><p class="mut" id="dv"></p><a class="btn wa" id="wa" target="_blank" rel="noopener" style="width:100%">💬 اطلب عبر واتساب</a><button class="btn ghost" data-act="shw" data-u="${esc(location.origin+"/p/"+p.id)}" style="width:100%;margin-top:8px">↗ شارك المنتج</button><button class="btn" data-act="cadd" style="width:100%;margin-top:8px">🛒 أضف إلى الطلبية</button><button class="btn ghost sm" data-act="rep" data-id="${p.id}" data-s="${p.store_id}" style="margin-top:8px">🚩 بلّغ عن مشكلة</button><div id="cmp"></div></div></div>`);
+ PCUR=p;try{const r=JSON.parse(localStorage.getItem("rv"))||[];localStorage.setItem("rv",JSON.stringify([p.id,...r.filter(x=>x!==p.id)].slice(0,8)))}catch(e){}const [{data:tr0},{data:sd},{data:ex}]=await Promise.all([db.from("product_tiers").select("min_qty,price").eq("product_id",id).order("min_qty"),db.from("stores_public").select("delivery_fee,delivery_days,min_order,shipping_companies").eq("id",p.store_id).maybeSingle(),db.from("product_extras").select("options").eq("product_id",id).maybeSingle()]);p.tr=tr0||[];const TR=p.tr;const ds=new Set((dv||[]).map(x=>x.wilaya_id)),im2=(im||[]).map(x=>x.url);
+ app(`<p><a class="mut" href="#products">← العودة للمنتجات</a></p><div class="pd"><div><div class="img big" id="mi">${im2[0]?img(im2[0]):"📦"}</div><div class="th">${im2.length>1?im2.map(u=>`<img src="${esc(u)}" data-src="${esc(u)}" alt="">`).join(""):""}</div></div><div><h1 style="margin:0 0 6px">${esc(p.name)}</h1><p class="price" style="font-size:24px;margin:8px 0">${PROMO[p.id]?`<s class="mut">${fm(p.carton_price)}</s> <span class="bdg" style="color:var(--danger)">${ic("flame","sm")}</span> ${fm(PROMO[p.id])}`:fm(p.carton_price)} <span class="mut">/ كرتونة (${p.units_per_carton} قطعة)</span></p>
+ <div class="row"><span>سعر القطعة</span><b>${fm(p.unit_price)}</b></div>${ex?.options?`<div class="row"><span>الخيارات</span><select id="opt">${ex.options.split(/[,،]/).map(o=>o.trim()).filter(Boolean).map(o=>`<option>${esc(o)}</option>`).join("")}</select></div>`:""}${TR.map(t=>`<div class="row"><span>من ${t.min_qty} كرتونة</span><b>${fm(t.price)} / كرتونة</b></div>`).join("")}${sd&&(sd.delivery_fee!=null||sd.delivery_days)?`<div class="row"><span>التوصيل</span><b>${sd.delivery_fee===0?"مجاني":sd.delivery_fee!=null?fm(sd.delivery_fee):""}${sd.delivery_days?" · "+sd.delivery_days+" أيام":""}</b></div>`:""}${sd?.shipping_companies?`<div class="row"><span>شركات الشحن</span><b>${esc(sd.shipping_companies)}</b></div>`:""}${sd?.min_order?`<div class="row"><span>الحد الأدنى للطلبية</span><b>${fm(sd.min_order)}</b></div>`:""}<div class="row"><span>الحد الأدنى للطلب</span><b>${p.min_qty_cartons} كرتونة</b></div><div class="row"><span>آخر تحديث للسعر</span><b>${ago(p.price_updated_at)}</b></div><div class="row"><span>المخزون</span><b class="${p.stock_cartons?"ok":"no"}">${p.stock_cartons?p.stock_cartons+" كرتونة – متوفر":"غير متوفر"}</b></div><div class="row"><span>المورد</span><a href="#store-${p.store_id}"><b>${esc(p.store_name)}</b> – ${wnh(p.store_wilaya_id)}</a></div>
+ <p>${esc(p.description||"")}</p><div style="display:flex;gap:8px;margin:14px 0"><input id="qt" type="number" min="${p.min_qty_cartons}" value="${p.min_qty_cartons}" style="width:90px" aria-label="الكمية"><select id="w" aria-label="الولاية">${opts(f.w,"اختر ولاية التوصيل")}</select></div><p class="mut" id="dv"></p><a class="btn wa" id="wa" target="_blank" rel="noopener" style="width:100%">💬 اطلب عبر واتساب</a><button class="btn ghost" data-act="shw" data-u="${esc(location.origin+"/p/"+p.id)}" style="width:100%;margin-top:8px">↗ شارك المنتج</button><button class="btn" data-act="cadd" style="width:100%;margin-top:8px">🛒 أضف إلى الطلبية</button><button class="btn ghost sm" data-act="rep" data-id="${p.id}" data-s="${p.store_id}" style="margin-top:8px">🚩 بلّغ عن مشكلة</button><div id="ph"></div><div id="cmp"></div></div></div>`);
  const u=()=>{const q=Math.max(+$("#qt").value||p.min_qty_cartons,p.min_qty_cartons),w=$("#w").value;f.w=w;
-  const t=`السلام عليكم، لقد رأيت منتج ${p.name} بسعر ${px(p,q)} دج للكرتونة، أرغب بشراء ${q} كرتونة`+(w?` والتوصيل إلى ولاية ${wn(w)}`:"")+". شكراً.";
+  const t=`السلام عليكم، لقد رأيت منتج ${p.name} ${$("#opt")?"(الخيار: "+$("#opt").value+") ":""}بسعر ${px(p,q)} دج للكرتونة، أرغب بشراء ${q} كرتونة`+(w?` والتوصيل إلى ولاية ${wn(w)}`:"")+". شكراً.";
   $("#wa").href=`https://wa.me/${p.whatsapp_phone}?text=${encodeURIComponent(t)}`;$("#dv").textContent=w?(ds.has(+w)?"✓ يوزّع المورد إلى "+wn(w):"⚠ قد لا يوزّع المورد إلى "+wn(w)+"، اسأله قبل الطلب"):"";return q};
- $("#qt").oninput=u;$("#w").oninput=u;u();cmpP(p);
+ $("#qt").oninput=u;$("#w").oninput=u;u();cmpP(p);histP(p);if($("#opt"))$("#opt").oninput=u;
  $("#wa").onclick=()=>{const q=u();db.rpc("log_whatsapp_click",{p_product:p.id,p_wilaya:f.w?+f.w:null,p_qty:q}).then(()=>{})}}
 async function store(id){
  const {data:s}=await db.from("stores_public").select().eq("id",id).maybeSingle();if(!s)return app('<p class="mut" style="padding:30px">المتجر غير موجود.</p>');
  const [{data:p},{data:dv}]=await Promise.all([db.from("products_public").select().eq("store_id",id).order("created_at",{ascending:false}),db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",id)]);
- app(`<div class="store" style="margin-top:20px;padding:20px"><div class="av" style="width:72px;height:72px;font-size:32px">${s.logo_url?img(s.logo_url):"🏬"}</div><div><h1 style="margin:0">${esc(s.name)}${s.verified?' <span class="tag ok">✅ مورد موثّق</span>':""}</h1><div class="mut">📍 ${wnh(s.wilaya_id)}${s.address?" · "+esc(s.address):""} · يوزّع إلى ${(dv||[]).length} ولاية</div>${s.hours?`<div class="mut">🕒 ${esc(s.hours)}</div>`:""}<p style="margin:6px 0">${esc(s.description||"")}</p>${s.facebook?`<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(s.facebook)}">فيسبوك</a> `:""}${s.instagram?`<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(s.instagram)}">إنستغرام</a> `:""}<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/${s.whatsapp_phone}">💬 تواصل عبر واتساب</a></div></div><div id="rv"></div><h2>منتجات المتجر</h2><div class="grid">${(p||[]).map(card).join("")||'<p class="mut">لا توجد منتجات.</p>'}</div>`);rvw(id)}
-async function stores(){const {data}=await db.from("stores_public").select("id,name,logo_url,wilaya_id,verified").order("created_at",{ascending:false});app(`<h2>جميع التجار</h2><div class="stores">${(data||[]).map(storeCard).join("")||'<p class="mut">لا يوجد تجار بعد.</p>'}</div>`)}
+ app(`<div class="store" style="margin-top:20px;padding:20px"><div class="av" style="width:72px;height:72px;font-size:32px">${s.logo_url?img(s.logo_url):"🏬"}</div><div><h1 style="margin:0">${esc(s.name)}${s.verified?' <span class="tag ok">${ic("shield","sm")} مورد موثّق</span>':""}${s.founder?' <span class="tag">${ic("award","sm")} مورد مؤسس</span>':""}</h1><div class="mut">📍 ${wnh(s.wilaya_id)}${s.address?" · "+esc(s.address):""} · يوزّع إلى ${(dv||[]).length} ولاية</div>${s.hours?`<div class="mut">🕒 ${esc(s.hours)}</div>`:""}${s.shipping_companies?`<div class="mut">🚚 الشحن: ${esc(s.shipping_companies)}</div>`:""}<p style="margin:6px 0">${esc(s.description||"")}</p>${s.facebook?`<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(s.facebook)}">فيسبوك</a> `:""}${s.instagram?`<a class="btn ghost sm" target="_blank" rel="noopener" href="${esc(s.instagram)}">إنستغرام</a> `:""}<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/${s.whatsapp_phone}">💬 تواصل عبر واتساب</a></div></div><p><a class="btn" href="#quick-${id}">⚡ طلب سريع من هذا المتجر</a></p><div id="rv"></div><h2>منتجات المتجر</h2><div class="grid">${(p||[]).map(card).join("")||'<p class="mut">لا توجد منتجات.</p>'}</div>`);rvw(id)}
+async function stores(){const {data}=await db.from("stores_public").select("id,name,logo_url,wilaya_id,verified,founder").order("created_at",{ascending:false});app(`<h2>جميع التجار</h2><div class="stores">${(data||[]).map(storeCard).join("")||'<p class="mut">لا يوجد تجار بعد.</p>'}</div>`)}
 
 /* ---------- auth ---------- */
 function auth(){if(me)return go(prof?.role==="supplier"?"dash":"home");let reg=false;
@@ -157,41 +2552,42 @@ async function dash(){
  if(!me||prof?.role!=="supplier")return go("auth");
  const {data:s}=await db.from("stores").select().eq("owner_id",me.id).maybeSingle();
  const dv=s?((await db.from("store_delivery_wilayas").select("wilaya_id").eq("store_id",s.id)).data||[]).map(x=>x.wilaya_id):[];
- app(`<div id="st"></div><h2>${s?"متجري":"أنشئ متجرك"} ${s?`<span class="tag">${ST[s.status]}</span>`:""}</h2>
+ app(`<div id="st"></div><div id="oi"></div><div id="dc"></div><h2>${s?"متجري":"أنشئ متجرك"} ${s?`<span class="tag">${ST[s.status]}</span>`:""}</h2>
  ${s&&s.status!=="approved"?`<div class="box">${s.status==="pending"?"⏳ متجرك قيد المراجعة ولن يظهر للزوار حتى يعتمده المشرف.":"⛔ متجرك موقوف. تواصل مع الإدارة."}</div>`:""}<form class="box form" id="sf"><div><label>اسم المتجر</label><input id="sn" value="${esc(s?.name)}" required></div><div><label>الولاية</label><select id="sw" required>${opts(s?.wilaya_id??"","اختر")}</select></div>
  <div><label>رقم واتساب</label><input id="sp" type="tel" value="${esc(s?"0"+s.whatsapp_phone.slice(3):prof.phone?"0"+prof.phone.slice(3):"")}" required></div><div><label>العنوان</label><input id="sa" value="${esc(s?.address)}"></div>
  <div class="f"><label>وصف المتجر</label><textarea id="sd" rows="3">${esc(s?.description)}</textarea></div><div class="f"><label>الشعار (صورة)</label><input id="lg" type="file" accept="image/jpeg,image/png,image/webp"></div>
  <div><label>فيسبوك (رابط)</label><input id="sfb" type="url" placeholder="https://facebook.com/..." value="${esc(s?.facebook)}"></div><div><label>إنستغرام (رابط)</label><input id="sig" type="url" placeholder="https://instagram.com/..." value="${esc(s?.instagram)}"></div><div class="f"><label>ساعات العمل</label><input id="sh" maxlength="100" placeholder="السبت–الخميس 8:00–17:00" value="${esc(s?.hours)}"></div>
  <div><label>رسوم التوصيل (دج، 0 = مجاني)</label><input id="sdf" type="number" min="0" value="${s?.delivery_fee??""}"></div><div><label>مدة التوصيل (أيام)</label><input id="sdd" type="number" min="1" max="30" value="${s?.delivery_days??""}"></div><div class="f"><label>الحد الأدنى لقيمة الطلبية (دج)</label><input id="smo" type="number" min="0" value="${s?.min_order??""}"></div>
+ <div class="f"><label>شركات الشحن التي تتعامل معها</label><input id="ssc" maxlength="150" placeholder="مثال: Yalidine، Zr Express، Procolis" value="${esc(s?.shipping_companies)}"></div>
  <div class="f"><details><summary>الولايات التي توزّع إليها (<span id="dc">${dv.length}</span>)</summary><button type="button" class="btn ghost sm" id="all">تحديد الكل / إلغاء</button><div class="dws">${W.map(w=>`<label><input type="checkbox" class="dw" value="${w.id}"${dv.includes(w.id)?" checked":""}>${esc(w.name_ar)}</label>`).join("")}</div></details></div><button class="btn f">حفظ المتجر</button></form>
  <div id="ps"></div>`);
  $("#all").onclick=()=>{const b=[...document.querySelectorAll(".dw")],on=b.some(x=>!x.checked);b.forEach(x=>x.checked=on)};
  $("#sf").onsubmit=async e=>{e.preventDefault();try{const ph=norm($("#sp").value);if(!/^213[567]\d{8}$/.test(ph))return msg("رقم واتساب غير صحيح");
   let logo=s?.logo_url||null;const fl=$("#lg").files[0];if(fl)logo=await up("store-logos",fl);
   const {error:er}=await db.rpc("save_store",{p_name:$("#sn").value,p_desc:$("#sd").value,p_wilaya:+$("#sw").value,p_address:$("#sa").value,p_phone:ph,p_logo:logo,p_delivery:[...document.querySelectorAll(".dw:checked")].map(x=>+x.value)});
-  if(er)throw er;{const n=x=>x===""?null:+x,{error:e2}=await db.from("stores").update({facebook:$("#sfb").value.trim()||null,instagram:$("#sig").value.trim()||null,hours:$("#sh").value.trim()||null,delivery_fee:n($("#sdf").value),delivery_days:n($("#sdd").value),min_order:n($("#smo").value)}).eq("owner_id",me.id);if(e2)throw e2}msg("تم الحفظ ✓",1);dash()}catch(x){msg(x.message)}};
- if(s){prodSection(s);stats(s)}}
+  if(er)throw er;{const n=x=>x===""?null:+x,{error:e2}=await db.from("stores").update({facebook:$("#sfb").value.trim()||null,instagram:$("#sig").value.trim()||null,hours:$("#sh").value.trim()||null,delivery_fee:n($("#sdf").value),delivery_days:n($("#sdd").value),min_order:n($("#smo").value),shipping_companies:$("#ssc").value.trim()||null}).eq("owner_id",me.id);if(e2)throw e2}msg("تم الحفظ ✓",1);dash()}catch(x){msg(x.message)}};
+ if(s){prodSection(s);stats(s);ordersIn(s);codes(s)}}
 async function prodSection(s,ed){
- const {data}=await db.from("products").select("*,product_images(id,url),product_tiers(min_qty,price)").eq("store_id",s.id).order("created_at",{ascending:false});cache=data||[];
+ const {data}=await db.from("products").select("*,product_images(id,url),product_tiers(min_qty,price),product_extras(options)").eq("store_id",s.id).order("created_at",{ascending:false});cache=data||[];
  const dp=ed==="new"&&prodSection.dup?cache.find(x=>x.id===prodSection.dup):null,p=ed&&ed!=="new"?cache.find(x=>x.id===ed):dp;
  $("#ps").innerHTML=`<h2>منتجاتي (${cache.length}) <button class="btn sm" data-act="pnew">+ منتج جديد</button> <button class="btn ghost sm" data-act="pcsv">استيراد CSV</button> <button class="btn ghost sm" data-act="pqe">تعديل الأسعار</button></h2>
  ${ed==="csv"?csvBox():ed==="qe"?qeBox():ed?`<form class="box form" id="pf"><div class="f"><label>اسم المنتج</label><input id="pn" value="${esc(p?.name)}" required></div><div><label>التصنيف</label><select id="pc">${copts(p?.category_id)}</select></div><div><label>سعر الكرتونة (دج)</label><input id="pp" type="number" min="1" step="0.01" value="${p?.carton_price??""}" required></div>
  <div><label>عدد القطع في الكرتونة</label><input id="pu" type="number" min="1" value="${p?.units_per_carton??1}" required></div><div><label>الحد الأدنى للطلب (كرتونة)</label><input id="pm" type="number" min="1" value="${p?.min_qty_cartons??1}" required></div>
  <div><label>المخزون (كرتونة)</label><input id="pk" type="number" min="0" value="${p?.stock_cartons??0}" required></div><div><label>صور المنتج (حتى 4)</label><input id="pi" type="file" accept="image/jpeg,image/png,image/webp" multiple></div>
- ${ed!=="new"&&p?.product_images?.length?`<div class="f th">${p.product_images.map(i=>`<span style="position:relative">${img(i.url)}<button type="button" class="btn red sm" style="position:absolute;top:0;inset-inline-start:0;min-height:22px;padding:0 6px" data-act="pimgdel" data-id="${i.id}">✕</button></span>`).join("")}</div>`:""}<div class="f"><label>أسعار الجملة حسب الكمية (اختياري): كمية:سعر للكرتونة، افصل بفاصلة. مثال 10:1200, 50:1100</label><input id="pt" value="${(ed!=="new"&&p?.product_tiers||[]).map(t=>t.min_qty+":"+t.price).join(", ")}"></div><div><label>سعر العرض (اختياري)</label><input id="ppr" type="number" min="1" step="0.01" value="${ed!=="new"&&p&&PROMO[p.id]||""}"></div><div><label>مدة العرض (أيام)</label><input id="pdy" type="number" min="1" max="60" value="7"></div><div class="f"><label>الوصف</label><textarea id="pd" rows="2">${esc(p?.description)}</textarea></div><div class="f" style="display:flex;gap:8px"><button class="btn">حفظ المنتج</button><button type="button" class="btn ghost" data-act="pcancel">إلغاء</button></div></form>`:""}
+ ${ed!=="new"&&p?.product_images?.length?`<div class="f th">${p.product_images.map(i=>`<span style="position:relative">${img(i.url)}<button type="button" class="btn red sm" style="position:absolute;top:0;inset-inline-start:0;min-height:22px;padding:0 6px" data-act="pimgdel" data-id="${i.id}">✕</button></span>`).join("")}</div>`:""}<div class="f"><label>خيارات المنتج (اختياري): افصل بفاصلة. مثال: S, M, L أو أحمر, أزرق</label><input id="po" maxlength="200" value="${esc(ed!=="new"?[].concat(p?.product_extras||[])[0]?.options:"")}"></div><div class="f"><label>أسعار الجملة حسب الكمية (اختياري): كمية:سعر للكرتونة، افصل بفاصلة. مثال 10:1200, 50:1100</label><input id="pt" value="${(ed!=="new"&&p?.product_tiers||[]).map(t=>t.min_qty+":"+t.price).join(", ")}"></div><div><label>سعر العرض (اختياري)</label><input id="ppr" type="number" min="1" step="0.01" value="${ed!=="new"&&p&&PROMO[p.id]||""}"></div><div><label>مدة العرض (أيام)</label><input id="pdy" type="number" min="1" max="60" value="7"></div><div class="f"><label>الوصف</label><textarea id="pd" rows="2">${esc(p?.description)}</textarea></div><div class="f" style="display:flex;gap:8px"><button class="btn">حفظ المنتج</button><button type="button" class="btn ghost" data-act="pcancel">إلغاء</button></div></form>`:""}
  ${cache.map(x=>`<div class="tr"><span style="display:flex;gap:10px;align-items:center"><span class="av" style="width:40px;height:40px">${x.product_images?.[0]?img(x.product_images[0].url):"📦"}</span><span><b>${esc(x.name)}</b><br><span class="mut">${fm(x.carton_price)} · مخزون ${x.stock_cartons}${x.is_hidden_by_admin?" · ⛔ محجوب من الإدارة":""}${x.is_active?"":" · مخفي"}</span></span></span><span><button class="btn ghost sm" data-act="pedit" data-id="${x.id}">تعديل</button> <button class="btn ghost sm" data-act="pdup" data-id="${x.id}">نسخ</button> <button class="btn ghost sm" data-act="ptog" data-id="${x.id}">${x.is_active?"إخفاء":"إظهار"}</button> <button class="btn red sm" data-act="pdel" data-id="${x.id}">حذف</button></span></div>`).join("")||'<p class="mut">لم تضف منتجات بعد.</p>'}`;
  const cf=$("#cf");if(cf)cf.onsubmit=async e=>{e.preventDefault();try{const R=csv(await $("#cfl").files[0].text()),K=["name","category","carton_price","units_per_carton","min_qty","stock","description"],rows=R.filter(r=>r[0]&&+r[2]>0).map(r=>Object.fromEntries(K.map((k,i)=>[k,(r[i]||"").trim()||null])));if(!rows.length)throw new Error("لا توجد صفوف صالحة");const {data,error}=await db.rpc("import_products",{p_store:s.id,p_rows:rows});if(error)throw error;msg(`تم استيراد ${data} منتج ✓`,1);prodSection(s)}catch(x){msg(x.message)}};
  const qf=$("#qf");if(qf)qf.onsubmit=async e=>{e.preventDefault();try{const m={};qf.querySelectorAll("[data-qid]").forEach(i=>(m[i.dataset.qid]=m[i.dataset.qid]||{})[i.dataset.k]=+i.value);const res=await Promise.all(cache.filter(x=>m[x.id]&&(m[x.id].carton_price!==+x.carton_price||m[x.id].stock_cartons!==x.stock_cartons)).map(x=>db.from("products").update(m[x.id]).eq("id",x.id))),er=res.find(r=>r.error);if(er)throw er.error;msg("تم الحفظ ✓",1);prodSection(s)}catch(x){msg(x.message)}};
  const pf=$("#pf");if(pf)pf.onsubmit=async e=>{e.preventDefault();try{if($("#ppr").value&&+$("#ppr").value>=+$("#pp").value)throw new Error("سعر العرض يجب أن يكون أقل من السعر الأصلي");const fs=[...$("#pi").files].slice(0,Math.min(4,6-(ed==="new"?0:(p?.product_images?.length||0)))),urls=[];for(const x of fs)urls.push(await up("product-images",x));
   const {data:pid,error:er}=await db.rpc("save_product",{p_id:ed&&ed!=="new"?p?.id:null,p_store:s.id,p_cat:+$("#pc").value,p_name:$("#pn").value,p_desc:$("#pd").value,p_price:+$("#pp").value,p_upc:+$("#pu").value,p_min:+$("#pm").value,p_stock:+$("#pk").value,p_images:urls});
   if(er)throw er;const T=($("#pt").value||"").split(/[,،]/).map(x=>x.split(":").map(Number)).filter(x=>x[0]>1&&x[1]>0).slice(0,3);await db.from("product_tiers").delete().eq("product_id",pid);if(T.length){const {error:e3}=await db.from("product_tiers").insert(T.map(x=>({product_id:pid,min_qty:x[0],price:x[1]})));if(e3)throw e3}
-  await db.from("promos").delete().eq("product_id",pid);const pp=+$("#ppr").value;if(pp>0){const {error:e4}=await db.from("promos").insert({product_id:pid,price:pp,until:new Date(Date.now()+864e5*Math.min(60,Math.max(1,+$("#pdy").value||7))).toISOString()});if(e4)throw e4}await loadPromo();msg("تم الحفظ ✓",1);prodSection(s)}catch(x){msg(x.message)}};
+  await db.from("promos").delete().eq("product_id",pid);const pp=+$("#ppr").value;if(pp>0){const {error:e4}=await db.from("promos").insert({product_id:pid,price:pp,until:new Date(Date.now()+864e5*Math.min(60,Math.max(1,+$("#pdy").value||7))).toISOString()});if(e4)throw e4}await db.from("product_extras").delete().eq("product_id",pid);{const po=$("#po").value.trim();if(po){const {error:e5}=await db.from("product_extras").insert({product_id:pid,options:po.slice(0,200)});if(e5)throw e5}}await loadPromo();msg("تم الحفظ ✓",1);prodSection(s)}catch(x){msg(x.message)}};
  prodSection.s=s;prodSection.ed=ed}
 
-async function stats(s){const [a,b,iv]=await Promise.all([db.rpc("my_stats"),db.rpc("my_stats_wilaya"),db.rpc("my_invites")]),p=a.data||[],w=b.data||[],sum=k=>p.reduce((n,x)=>n+x[k],0),u=location.origin+"/s/"+s.id,top=p.filter(x=>x.clicks30).slice(0,5);
- $("#st").innerHTML=`<h2>📊 أداء متجرك</h2><div class="stat"><div><b>${sum("clicks7")}</b><span class="mut">طلبات واتساب (7 أيام)</span></div><div><b>${sum("clicks30")}</b><span class="mut">آخر 30 يوم</span></div><div><b>${p.length}</b><span class="mut">منتج</span></div></div>
+async function stats(s){const [a,b,iv]=await Promise.all([db.rpc("my_stats"),db.rpc("my_stats_wilaya"),db.rpc("my_invites")]),p=a.data||[],w=b.data||[],sum=k=>p.reduce((n,x)=>n+x[k],0),u=location.origin+"/s/"+s.id,top=p.filter(x=>x.clicks30).slice(0,5),ck=[s.logo_url,s.description,s.hours,s.facebook||s.instagram,p.length>=5,s.delivery_days||s.delivery_fee!=null,s.shipping_companies],pc=Math.round(100*ck.filter(Boolean).length/ck.length);
+ $("#st").innerHTML=`<h2>📊 أداء متجرك</h2>${FREE?`<p class="mut">🎁 الاستخدام مجاني حتى ${esc(FREE)}.</p>`:""}${s.founder?"<p>🏅 أنت مورد مؤسس في المنصة.</p>":""}${pc<100?`<p class="mut">📋 اكتمال متجرك ${pc}% — أكمل بياناتك ليثق بك التجار أكثر.</p>`:""}<div class="stat"><div><b>${sum("clicks7")}</b><span class="mut">طلبات واتساب (7 أيام)</span></div><div><b>${sum("clicks30")}</b><span class="mut">آخر 30 يوم</span></div><div><b>${p.length}</b><span class="mut">منتج</span></div></div>
  <div class="box">${top.length?`<b>الأكثر طلباً (30 يوم)</b>${top.map(x=>`<div class="row"><span>${esc(x.name)}</span><b>${x.clicks30}</b></div>`).join("")}${w.length?`<p class="mut">أكثر الولايات طلباً: ${w.slice(0,3).map(x=>wnh(x.wilaya_id)+" ("+x.clicks+")").join("، ")}</p>`:""}`:'<span class="mut">ستظهر الإحصائيات هنا عند أول طلب من الزبائن.</span>'}</div>
- ${s.status==="approved"?`<div class="box" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span>🔗 شارك متجرك مع زبائنك:</span><button class="btn wa sm" data-act="shw" data-u="${esc(u)}">واتساب</button><button class="btn ghost sm" data-act="cpy" data-u="${esc(u)}">نسخ الرابط</button><a class="btn ghost sm" href="#catalog-${s.id}">📄 كتالوج PDF</a> <button class="btn ghost sm" data-act="pause" data-v="${s.is_paused?0:1}">${s.is_paused?"▶ إنهاء الإجازة":"⏸ وضع الإجازة"}</button></div><div class="box" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span>🎁 ادعُ موردين (${iv.data||0} سجّلوا عبر رابطك):</span><button class="btn ghost sm" data-act="cpy" data-u="${esc(location.origin+"/?ref="+me.id)}">نسخ رابط الدعوة</button></div>`:""}`}
+ ${s.status==="approved"?`<div class="box" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span>🔗 شارك متجرك مع زبائنك:</span><button class="btn wa sm" data-act="shw" data-u="${esc(u)}">واتساب</button><button class="btn ghost sm" data-act="cpy" data-u="${esc(u)}">نسخ الرابط</button><a class="btn ghost sm" href="#catalog-${s.id}">📄 كتالوج PDF</a> <a class="btn ghost sm" href="#qr-${s.id}">رمز QR</a> <button class="btn ghost sm" data-act="pause" data-v="${s.is_paused?0:1}">${s.is_paused?"▶ إنهاء الإجازة":"⏸ وضع الإجازة"}</button></div><div class="box" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span>🎁 ادعُ موردين (${iv.data||0} سجّلوا عبر رابطك):</span><button class="btn ghost sm" data-act="cpy" data-u="${esc(location.origin+"/?ref="+me.id)}">نسخ رابط الدعوة</button></div><div class="box"><span>🔔 إشعارات تيليغرام للطلبات: </span>${s.telegram_chat_id?"<b>✅ مفعّلة</b>":TG_BOT!=="YOUR_BOT_USERNAME"?`<a class="btn ghost sm" target="_blank" rel="noopener" href="https://t.me/${TG_BOT}?start=${esc(s.telegram_code)}">فعّلها</a>`:'<span class="mut">قريباً</span>'}</div>`:""}`}
 
 /* ---------- admin ---------- */
 async function admin(){
@@ -204,7 +2600,7 @@ async function admin(){
  <h2>المستخدمون</h2><div class="box">${(us.data||[]).map(x=>`<div class="tr"><span><b>${esc(x.full_name||"—")}</b> <span class="tag">${x.role==="supplier"?"مورد":"صاحب محل"}</span>${x.is_blocked?' <span class="tag no">محظور</span>':""}<br><span class="mut">${esc(x.phone||"")}</span></span><button class="btn ${x.is_blocked?"":"red "}sm" data-act="ublk" data-id="${x.id}" data-v="${x.is_blocked?0:1}">${x.is_blocked?"إلغاء الحظر":"حظر"}</button></div>`).join("")||'<p class="mut">لا يوجد مستخدمون.</p>'}</div>`);adminExtra()}
 
 /* ---------- profile / favs / cart / how ---------- */
-const CART=()=>{try{return JSON.parse(localStorage.getItem("cart"))||[]}catch(e){return[]}},SAVE=c=>{try{localStorage.setItem("cart",JSON.stringify(c))}catch(e){}cartN()},cartN=()=>{const e=$("#ct");if(e)e.textContent="🛒"+(CART().length||"")};
+const CART=()=>{try{return JSON.parse(localStorage.getItem("cart"))||[]}catch(e){return[]}},SAVE=c=>{try{localStorage.setItem("cart",JSON.stringify(c))}catch(e){}cartN()},cartN=()=>{const e=$("#ct");if(e){const n=CART().length;e.innerHTML=ic("cart")+(n?`<span class="cnt">${n}</span>`:"");e.setAttribute("aria-label","السلة"+(n?" ("+n+")":""))}};
 function profile(){if(!me)return go("auth");
  app(`<form class="box" id="pf1" style="max-width:420px;margin:30px auto;display:flex;flex-direction:column;gap:10px"><h2 style="margin:0">حسابي</h2><label>الاسم</label><input id="pn1" value="${esc(prof?.full_name)}" required><label>الهاتف</label><input id="pp1" type="tel" value="${esc(prof?.phone?"0"+prof.phone.slice(3):"")}"><button class="btn">حفظ</button></form>
  <form class="box" id="pf2" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:10px"><h2 style="margin:0">تغيير كلمة المرور</h2><input id="np" type="password" minlength="6" placeholder="كلمة المرور الجديدة" required><button class="btn">تغيير</button></form>`);
@@ -212,11 +2608,11 @@ function profile(){if(!me)return go("auth");
  $("#pf2").onsubmit=async e=>{e.preventDefault();const {error}=await db.auth.updateUser({password:$("#np").value});msg(error?error.message:"تم تغيير كلمة المرور ✓",!error);if(!error)e.target.reset()}}
 async function favs(){if(!me)return go("auth");const {data}=await db.from("favorites").select("product_id").order("created_at",{ascending:false}),ids=(data||[]).map(x=>x.product_id),{data:p}=ids.length?await db.from("products_public").select().in("id",ids):{data:[]};
  app(`<h2>♥ مفضلتي</h2><div class="grid">${(p||[]).map(card).join("")||'<p class="mut">لم تضف شيئاً بعد. اضغط ♡ على أي منتج.</p>'}</div>`)}
-function cart(){const c=CART(),g={};c.forEach(i=>(g[i.s]=g[i.s]||[]).push(i));
- app(`<h2>🛒 طلبيتي</h2><div class="box"><label>ولاية التوصيل</label><select id="cw">${opts(f.w,"اختر ولاية")}</select></div>${Object.values(g).map(L=>`<div class="box"><b>${esc(L[0].sn)}</b>${L.map(i=>`<div class="tr"><span>${esc(i.n)}<br><span class="mut">${fm(prc(i))} / كرتونة</span></span><span><input type="number" min="${i.min}" value="${i.q}" style="width:80px" data-ci="${i.id}"> <button class="btn red sm" data-act="cdel" data-id="${i.id}">✕</button></span></div>`).join("")}<p><b>المجموع: <span data-tot="${L[0].s}"></span></b></p><a class="btn wa" target="_blank" rel="noopener" data-wa="${L[0].s}" style="width:100%">💬 أرسل الطلبية عبر واتساب</a></div>`).join("")||'<p class="mut">طلبيتك فارغة. أضف منتجات من صفحاتها.</p>'}${c.length?'<p class="mut">رسالة واحدة لكل مورد. الأسعار المعروضة وقت الإضافة وقد تتغير.</p>':""}`);
- const u=()=>{const w=$("#cw").value;f.w=w;Object.values(g).forEach(L=>{const t=L.reduce((n,i)=>n+prc(i)*i.q,0),a=document.querySelector(`[data-wa="${L[0].s}"]`);document.querySelector(`[data-tot="${L[0].s}"]`).textContent=fm(t);
-  a.href=`https://wa.me/${L[0].ph}?text=`+encodeURIComponent("السلام عليكم، أرغب بطلب:\n"+L.map(i=>`- ${i.n} × ${i.q} كرتونة (${prc(i)} دج)`).join("\n")+`\nالمجموع: ${t} دج`+(w?`\nالتوصيل إلى ولاية ${wn(w)}`:"")+"\nشكراً.")})};
- if(c.length){$("#cw").oninput=u;document.querySelectorAll("[data-ci]").forEach(x=>x.oninput=()=>{const c2=CART(),i=c2.find(y=>y.id===x.dataset.ci);i.q=Math.max(+x.value||i.min,i.min);SAVE(c2);u()});u()}}
+function cart(){if(!me)return go("auth");const c=CART(),g={};c.forEach(i=>(g[i.s]=g[i.s]||[]).push(i));
+ app(`<h2>🛒 طلبيتي</h2><div class="box"><label>ولاية التوصيل</label><select id="cw">${opts(f.w,"اختر ولاية")}</select></div>${Object.values(g).map(L=>`<div class="box"><b>${esc(L[0].sn)}</b>${L.map(i=>`<div class="tr"><span>${esc(i.n)}<br><span class="mut">${fm(prc(i))} / كرتونة</span></span><span><input type="number" min="${i.min}" value="${i.q}" style="width:80px" data-ci="${i.id}"> <button class="btn red sm" data-act="cdel" data-id="${i.id}">✕</button></span></div>`).join("")}<div style="display:flex;gap:6px;margin:8px 0"><input placeholder="كود خصم" data-dcin="${L[0].s}" style="width:120px"><button class="btn ghost sm" data-act="dcapply" data-s="${L[0].s}">تطبيق</button></div>${DC[L[0].s]?`<p class="mut">✅ خصم ${DC[L[0].s]}% (${esc(DCN[L[0].s])})</p>`:""}<p><b>المجموع: <span data-tot="${L[0].s}"></span></b></p><a class="btn wa" target="_blank" rel="noopener" data-wa="${L[0].s}" style="width:100%">💬 أرسل الطلبية عبر واتساب</a></div>`).join("")||'<p class="mut">طلبيتك فارغة. أضف منتجات من صفحاتها.</p>'}${c.length?'<p class="mut">رسالة واحدة لكل مورد. الأسعار المعروضة وقت الإضافة وقد تتغير.</p>':""}`);
+ const u=()=>{const w=$("#cw").value;f.w=w;Object.values(g).forEach(L=>{const t=Math.round(L.reduce((n,i)=>n+prc(i)*i.q,0)*(1-(DC[L[0].s]||0)/100)),a=document.querySelector(`[data-wa="${L[0].s}"]`);document.querySelector(`[data-tot="${L[0].s}"]`).textContent=fm(t);
+  a.href=`https://wa.me/${L[0].ph}?text=`+encodeURIComponent("السلام عليكم، أرغب بطلب:\n"+L.map(i=>`- ${i.n} × ${i.q} كرتونة (${prc(i)} دج)`).join("\n")+`${DC[L[0].s]?`\nكود الخصم: ${DCN[L[0].s]} (${DC[L[0].s]}%)`:""}\nالمجموع: ${t} دج`+(w?`\nالتوصيل إلى ولاية ${wn(w)}`:"")+"\nشكراً.")})};
+ if(c.length){$("#cw").oninput=u;document.querySelectorAll("[data-ci]").forEach(x=>x.oninput=()=>{const c2=CART(),i=c2.find(y=>y.id===x.dataset.ci);i.q=Math.max(+x.value||i.min,i.min);SAVE(c2);u()});document.querySelectorAll("[data-wa]").forEach(a=>a.addEventListener("click",()=>{const L=g[a.dataset.wa];db.from("orders").insert({user_id:me.id,store_id:a.dataset.wa,store_name:L[0].sn,buyer_name:prof?.full_name||null,items:L.map(i=>({id:i.id,n:i.n,q:i.q,pr:i.pr,min:i.min,s:i.s,sn:i.sn,ph:i.ph,tr:i.tr})),total:L.reduce((n,i)=>n+prc(i)*i.q,0)}).then(()=>{})}));u()}}
 function how(){app(`<h2>كيف يعمل سوق الجملة؟</h2><div class="box"><b>للمورد</b><p>سجّل كمورد وأكّد بريدك، أنشئ متجرك وحدّد الولايات التي توزّع إليها، ثم أضف منتجاتك بسعر الكرتونة. بعد اعتماد المتجر من الإدارة يظهر للجميع وتصلك الطلبات مباشرة على واتساب.</p></div><div class="box"><b>لصاحب المحل</b><p>ابحث عن المنتج، قارن الأسعار، أضف ما تحتاجه إلى طلبيتك وأرسلها للمورد عبر واتساب.</p></div><div class="box"><b>أسئلة شائعة</b><p><b>من يتولى الدفع والتوصيل؟</b> يتم الاتفاق عليهما مباشرة بينك وبين المورد.<br><b>متى يظهر متجري؟</b> بعد مراجعة الإدارة.</p></div>`)}
 
 function csv(t){const R=[];let r=[],c="",q=0;t=t.replace(/^\uFEFF/,"");for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=0}else c+=ch}else if(ch==='"')q=1;else if(ch===","||ch===";"){r.push(c);c=""}else if(ch==="\n"){r.push(c);R.push(r);r=[];c=""}else if(ch!=="\r")c+=ch}if(c||r.length){r.push(c);R.push(r)}return R}
@@ -232,12 +2628,41 @@ async function rfq(){if(!me)return go("auth");const sup=prof?.role==="supplier",
  app(`<h2>طلبات عروض الأسعار</h2>${prof?.role==="shop_owner"?`<form class="box form" id="qf2"><div class="f"><label>ماذا تحتاج؟</label><input id="qi" maxlength="200" required placeholder="مثال: 50 كرتونة زيت مائدة 5 لتر"></div><div><label>الكمية (اختياري)</label><input id="qq" maxlength="60"></div><div><label>الولاية</label><select id="qw" required>${opts("","اختر")}</select></div><div class="f"><label>رقم واتساب للتواصل</label><input id="qp" type="tel" value="${esc(prof.phone?"0"+prof.phone.slice(3):"")}" required></div><button class="btn f">انشر الطلب</button></form>`:""}<div class="box">${(data||[]).map(x=>`<div class="tr"><span><b>${esc(x.item)}</b> ${esc(x.qty||"")}<br><span class="mut">${wnh(x.wilaya_id)}</span></span>${sup?`<a class="btn wa sm" target="_blank" rel="noopener" href="https://wa.me/${esc(x.phone)}?text=${encodeURIComponent("السلام عليكم، رأيت طلبك على سوق الجملة: "+x.item)}">قدّم عرضك</a>`:x.user_id===me.id?`<button class="btn red sm" data-act="rdel" data-id="${x.id}">حذف</button>`:""}</span></div>`).join("")||'<p class="mut">لا توجد طلبات.</p>'}</div>`);
  const q=$("#qf2");if(q)q.onsubmit=async e=>{e.preventDefault();const ph=norm($("#qp").value);if(!/^213[567]\d{8}$/.test(ph))return msg("رقم غير صحيح");const {error}=await db.from("rfq").insert({user_id:me.id,item:$("#qi").value,qty:$("#qq").value||null,wilaya_id:+$("#qw").value,phone:ph});msg(error?error.message:"تم نشر الطلب ✓",!error);if(!error)rfq()}}
 async function catalog(id){const [{data:s},{data:p}]=await Promise.all([db.from("stores_public").select().eq("id",id).maybeSingle(),db.from("products_public").select().eq("store_id",id).order("name")]);if(!s)return app('<p class="mut">المتجر غير موجود.</p>');
- app(`<p><button class="btn" data-act="prt">🖨 طباعة / حفظ PDF</button></p><h1>${esc(s.name)}</h1><p class="mut">واتساب: 0${esc(s.whatsapp_phone.slice(3))} · ${wnh(s.wilaya_id)}</p><div class="box">${(p||[]).map(x=>`<div class="tr"><span>${esc(x.name)}<br><span class="mut">${x.units_per_carton} قطعة · الحد الأدنى ${x.min_qty_cartons}</span></span><b>${fm(x.carton_price)}</b></div>`).join("")}</div>`)}
+ app(`<p><button class="btn" data-act="prt">🖨 طباعة / حفظ PDF</button></p><h1>${esc(s.name)}</h1><p class="mut">واتساب: ${s.whatsapp_phone?"0"+esc(s.whatsapp_phone.slice(3)):"🔒 سجّل الدخول لرؤية الرقم"} · ${wnh(s.wilaya_id)}</p><div class="box">${(p||[]).map(x=>`<div class="tr"><span>${esc(x.name)}<br><span class="mut">${x.units_per_carton} قطعة · الحد الأدنى ${x.min_qty_cartons}</span></span><b>${fm(x.carton_price)}</b></div>`).join("")}</div>`)}
 async function adminExtra(){const {data:r}=await db.from("reports").select("reason,product_id,products(name),stores(name)").order("created_at",{ascending:false}).limit(30);
  $("#app").insertAdjacentHTML("beforeend",`<h2>البلاغات (${(r||[]).length})</h2><div class="box">${(r||[]).map(x=>`<div class="tr"><span><b>${esc(x.products?.name||"—")}</b> – ${esc(x.stores?.name||"")}<br><span class="mut">${esc(x.reason)}</span></span>${x.product_id?`<a class="btn ghost sm" href="#product-${x.product_id}">عرض</a>`:""}</div>`).join("")||'<p class="mut">لا توجد بلاغات.</p>'}</div><button class="btn ghost" data-act="exp">⬇ تصدير المتاجر CSV</button>`)}
 
-const px=(p,q)=>{let x=PROMO[p.id]??+p.carton_price;(p.tr||[]).forEach(t=>{if(q>=t.min_qty)x=Math.min(x,+t.price)});return x},prc=i=>{let x=PROMO[i.id]??+i.pr;(i.tr||[]).forEach(t=>{if(i.q>=t.min_qty)x=Math.min(x,+t.price)});return x};
+const px=(p,q)=>{let x=PROMO[p.id]??+p.carton_price;(p.tr||[]).forEach(t=>{if(q>=t.min_qty)x=Math.min(x,+t.price)});return x},prc=i=>{let x=PROMO[i.pid||i.id]??+i.pr;(i.tr||[]).forEach(t=>{if(i.q>=t.min_qty)x=Math.min(x,+t.price)});return x};
 async function loadPromo(){try{const {data}=await db.from("promos").select("product_id,price").gt("until",new Date().toISOString());PROMO={};(data||[]).forEach(x=>PROMO[x.product_id]=+x.price)}catch(e){}}
+
+const TG_BOT="YOUR_BOT_USERNAME";let ORD=[];
+async function orders(){if(!me)return go("auth");const {data}=await db.from("orders").select().order("created_at",{ascending:false}).limit(30);ORD=data||[];
+ app(`<h2>طلباتي السابقة</h2>${ORD.map(o=>`<div class="box"><b>${esc(o.store_name)}</b> <span class="mut">${ago(o.created_at)} · ${{new:"أُرسلت للمورد",shipped:"تم الشحن",delivered:"وصلت",canceled:"أُلغيت"}[o.status]||""}${o.tracking?" · تتبع: "+esc(o.tracking):""}${Date.now()-new Date(o.created_at)>12096e5&&o.status!=="canceled"?' <span class="tag">⏰ حان وقت إعادة الطلب</span>':""}</span>${o.items.map(i=>`<div class="row"><span>${esc(i.n)}</span><b>${i.q} كرتونة</b></div>`).join("")}<button class="btn sm" data-act="reorder" data-id="${o.id}">🔁 أعد الطلب</button></div>`).join("")||'<p class="mut">لا توجد طلبات سابقة. تُسجَّل هنا الطلبات التي ترسلها من السلة.</p>'}`)}
+
+let QP=[];
+function nl(t){let w="";W.forEach(x=>{const n=wn(x.id);if(n&&t.includes(n)){w=x.id;t=t.replace(n," ")}});const S=["في","إلى","الى","كرتونة","كرتون","كراتين","جملة","لـ"];return{q:t.split(/\s+/).filter(z=>z.length>1&&!/^\d+$/.test(z)&&!S.includes(z)).join(" "),w}}
+async function quick(id){const [{data:s},{data:p}]=await Promise.all([db.from("stores_public").select("id,name").eq("id",id).maybeSingle(),db.from("products_public").select().eq("store_id",id).order("name")]);if(!s)return app('<p class="mut">المتجر غير موجود.</p>');QP=p||[];
+ app(`<h2>طلب سريع من ${esc(s.name)}</h2><div class="box">${QP.map(x=>`<div class="tr"><span>${esc(x.name)}<br><span class="mut">${fm(PROMO[x.id]??x.carton_price)} · الحد الأدنى ${x.min_qty_cartons}</span></span><input type="number" min="0" style="width:80px" data-q="${x.id}" placeholder="0"></div>`).join("")||'<p class="mut">لا توجد منتجات.</p>'}</div><button class="btn" data-act="qadd">🛒 أضف المحدد إلى طلبيتي</button>`)}
+function suppliers(){const u=location.origin+(me?"/?ref="+me.id:"/");app(`<section style="text-align:center;padding:30px 0"><h1>بِع بالجملة لتجّار كل الجزائر</h1><p class="mut">اعرض منتجاتك بسعر الكرتونة، ويصلك التاجر مباشرة على واتساب.</p><a class="btn" href="#auth">سجّل كمورد</a></section><div class="box"><b>ماذا ستحصل عليه؟</b><div class="row"><span>🌍 ظهور أمام التجار في الولايات التي توزّع إليها</span></div><div class="row"><span>💬 طلبات مباشرة على واتساب مع سجل بالطلبات الواردة</span></div><div class="row"><span>📊 إحصائيات: أي منتج يُطلب أكثر</span></div><div class="row"><span>📄 كتالوج PDF وروابط مشاركة جاهزة</span></div><div class="row"><span>🏅 شارة "مورد مؤسس" لأوائل الموردين</span></div></div><div class="box"><b>ادعُ موردين تعرفهم</b><p class="mut">رسالة جاهزة تُرسل بضغطة واحدة.</p><button class="btn wa" data-act="inv" data-u="${esc(u)}">💬 أرسلها على واتساب</button></div>`)}
+async function ordersIn(s){const {data}=await db.from("orders").select("id,buyer_name,items,status,tracking,created_at").eq("store_id",s.id).order("created_at",{ascending:false}).limit(20);if(!$("#oi"))return;const L={new:"جديد",shipped:"تم الشحن",delivered:"وصلت",canceled:"أُلغيت"};
+ $("#oi").innerHTML=`<h2>📥 الطلبات الواردة</h2>${(data||[]).map(o=>`<div class="box"><b>${esc(o.buyer_name||"تاجر")}</b> <span class="mut">${ago(o.created_at)} · ${L[o.status]}${o.tracking?" · "+esc(o.tracking):""}</span>${o.items.map(i=>`<div class="row"><span>${esc(i.n)}</span><b>${i.q} كرتونة</b></div>`).join("")}${o.status==="new"||o.status==="shipped"?`<div style="margin-top:8px;display:flex;gap:6px"><button class="btn sm" data-act="ost" data-id="${o.id}" data-v="shipped">📦 تم الشحن</button><button class="btn ghost sm" data-act="ost" data-id="${o.id}" data-v="delivered">وصلت</button><button class="btn red sm" data-act="ost" data-id="${o.id}" data-v="canceled">إلغاء</button></div>`:""}</div>`).join("")||'<p class="mut">لا توجد طلبات بعد. تظهر هنا الطلبات التي يرسلها التجار من سلتهم.</p>'}`}
+
+let DC={},DCN={};
+async function codes(s){const {data}=await db.from("discount_codes").select().eq("store_id",s.id);if(!$("#dc"))return;
+ $("#dc").innerHTML=`<h2>🏷 أكواد الخصم</h2><div class="box">${(data||[]).map(x=>`<div class="tr"><span><b>${esc(x.code)}</b> — ${x.percent}%${x.expires_at?" · حتى "+new Date(x.expires_at).toLocaleDateString("ar-DZ"):""}</span><button class="btn red sm" data-act="dcdel" data-c="${esc(x.code)}">حذف</button></div>`).join("")}<form id="df" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><input id="dcc" placeholder="الكود (حروف وأرقام)" maxlength="20" required style="width:140px"><input id="dcp" type="number" min="1" max="50" placeholder="% خصم" required style="width:90px"><input id="dcd" type="number" min="1" max="365" placeholder="أيام (اختياري)" style="width:110px"><button class="btn sm">إضافة</button></form></div>`;
+ $("#df").onsubmit=async e=>{e.preventDefault();const n=+$("#dcd").value,{error}=await db.from("discount_codes").insert({store_id:s.id,code:$("#dcc").value.trim().toUpperCase(),percent:+$("#dcp").value,expires_at:n?new Date(Date.now()+864e5*n).toISOString():null});msg(error?"الكود غير صالح أو مكرر":"تمت الإضافة ✓",!error);if(!error)codes(s)}}
+async function histP(p){const {data}=await db.from("price_history").select("price,changed_at").eq("product_id",p.id).order("changed_at",{ascending:false}).limit(5);if(data?.length&&$("#ph"))$("#ph").innerHTML=`<h3>تغيّر السعر</h3>`+data.map(x=>`<div class="row"><span>${ago(x.changed_at)}</span><b>${fm(x.price)}</b></div>`).join("")}
+async function market(){const {data}=await db.from("products_public").select("name,carton_price,store_id").limit(500),G={};(data||[]).forEach(x=>{const k=x.name.trim().split(/\s+/).slice(0,2).join(" "),g=G[k]=G[k]||{p:[],s:new Set()};g.p.push(+x.carton_price);g.s.add(x.store_id)});
+ const L=Object.entries(G).filter(([k,g])=>g.s.size>=2).sort((a,b)=>b[1].s.size-a[1].s.size).slice(0,30);
+ app(`<h2>📈 أسعار السوق</h2><p class="mut">مقارنة سعر الكرتونة لمنتجات يعرضها أكثر من مورد.</p><div class="box">${L.map(([k,g])=>`<div class="tr"><span><b>${esc(k)}</b><br><span class="mut">${g.s.size} موردين</span></span><span>${fm(Math.min(...g.p))} – ${fm(Math.max(...g.p))} <button class="btn ghost sm" data-act="mq" data-q="${esc(k)}">عرض</button></span></div>`).join("")||'<p class="mut">ستظهر المقارنات عندما يعرض أكثر من مورد منتجات متشابهة.</p>'}</div>`)}
+
+async function bell(){const e=$("#bell");if(!e||!me)return;const {count}=await db.from("notifications").select("id",{count:"exact",head:true}).eq("is_read",false);e.innerHTML=ic("bell")+(count?`<span class="cnt">${count}</span>`:"");e.setAttribute("aria-label","الإشعارات"+(count?" ("+count+")":""))}
+async function notes(){if(!me)return go("auth");const {data}=await db.from("notifications").select().order("created_at",{ascending:false}).limit(30);
+ app(`<h2>🔔 الإشعارات</h2><div class="box">${(data||[]).map(n=>`<a class="tr" href="#product-${n.product_id}"><span>${esc(n.text)}<br><span class="mut">${ago(n.created_at)}</span></span>${n.is_read?"":"<b>جديد</b>"}</a>`).join("")||'<p class="mut">لا توجد إشعارات. أضف منتجات إلى المفضلة (♡) لتصلك تنبيهات انخفاض السعر.</p>'}</div>`);
+ await db.from("notifications").update({is_read:true}).eq("is_read",false);bell()}
+function qr(id){const u=location.origin+"/s/"+id,q=qrcode(0,"M");q.addData(u);q.make();
+ app(`<p><button class="btn" data-act="prt">🖨 طباعة</button></p><div class="box" style="text-align:center"><h2 id="qn"></h2><div style="width:280px;max-width:100%;margin:auto">${q.createSvgTag({cellSize:6,margin:2,scalable:true})}</div><p class="mut">${esc(u)}</p><p>امسح الرمز لتصفّح منتجاتنا على سوق الجملة</p></div>`);
+ db.from("stores_public").select("name").eq("id",id).maybeSingle().then(({data})=>{if(data&&$("#qn"))$("#qn").textContent=data.name})}
 
 /* ---------- delegated actions ---------- */
 document.addEventListener("click",async e=>{const t=e.target,d=t.dataset||{};
@@ -247,6 +2672,13 @@ document.addEventListener("click",async e=>{const t=e.target,d=t.dataset||{};
  else if(d.act==="prt")print();
  else if(d.act==="pause"){const {error}=await db.from("stores").update({is_paused:d.v==="1"}).eq("owner_id",me.id);if(error)throw error;msg(d.v==="1"?"متجرك مخفي مؤقتاً":"عاد متجرك للظهور ✓",1);dash()}
  else if(d.act==="exp"){const {data}=await db.from("stores").select("name,status,verified,whatsapp_phone,wilaya_id,created_at"),L=["name,status,verified,phone,wilaya,created"].concat((data||[]).map(x=>[x.name,x.status,x.verified,x.whatsapp_phone,wn(x.wilaya_id),x.created_at].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\uFEFF"+L.join("\n")],{type:"text/csv"}));a.download="stores.csv";a.click()}
+ else if(d.act==="reorder"){const o=ORD.find(x=>x.id===d.id),c=CART();o.items.forEach(i=>{const x=c.find(y=>y.id===i.id);x?x.q=i.q:c.push(i)});SAVE(c);go("cart")}
+ else if(d.act==="qadd"){if(!me)return go("auth");const c=CART();let n=0;document.querySelectorAll("[data-q]").forEach(i=>{const q=+i.value;if(q>0){const x=QP.find(y=>y.id===i.dataset.q),k=c.find(y=>y.id===x.id),qq=Math.max(q,x.min_qty_cartons);k?k.q=qq:c.push({id:x.id,n:x.name,pr:x.carton_price,q:qq,min:x.min_qty_cartons,s:x.store_id,sn:x.store_name,ph:x.whatsapp_phone,tr:[]});n++}});if(!n)return msg("اكتب كمية لمنتج واحد على الأقل");SAVE(c);go("cart")}
+ else if(d.act==="inv")open("https://wa.me/?text="+encodeURIComponent("اعرض بضاعتك بالجملة على سوق الجملة لتصل إلى تجار كل الجزائر. سجّل من هنا: "+d.u),"_blank","noopener");
+ else if(d.act==="ost"){const t2=d.v==="shipped"?(prompt("رقم التتبع (اختياري)")||""):"";const {error}=await db.rpc("set_order_status",{p_id:d.id,p_status:d.v,p_tracking:t2});if(error)throw error;ordersIn(prodSection.s)}
+ else if(d.act==="mq"){f.q=d.q;go("products")}
+ else if(d.act==="dcdel"){await db.from("discount_codes").delete().eq("store_id",prodSection.s.id).eq("code",d.c);codes(prodSection.s)}
+ else if(d.act==="dcapply"){const v=document.querySelector(`[data-dcin="${d.s}"]`).value.trim().toUpperCase(),{data,error}=await db.rpc("check_code",{p_store:d.s,p_code:v});if(error)throw error;if(!data)return msg("كود غير صالح أو منتهٍ");DC[d.s]=data;DCN[d.s]=v;cart();msg("تم تطبيق الخصم "+data+"%",1)}
  else if(d.act==="pcsv")prodSection(s,"csv");
  else if(d.act==="pqe")prodSection(s,"qe");
  else if(d.act==="pdup"){prodSection.dup=d.id;prodSection(s,"new")}
@@ -256,13 +2688,14 @@ document.addEventListener("click",async e=>{const t=e.target,d=t.dataset||{};
  else if(d.act==="shw")open("https://wa.me/?text="+encodeURIComponent("شاهد هذا على سوق الجملة: "+d.u),"_blank","noopener");
  else if(d.act==="cpy"){await navigator.clipboard.writeText(d.u);msg("تم نسخ الرابط ✓",1)}
  else if(d.act==="fav"){if(!me)return go("auth");const on=FV.has(d.id),{error}=on?await db.from("favorites").delete().eq("product_id",d.id):await db.from("favorites").insert({user_id:me.id,product_id:d.id});if(error)throw error;on?FV.delete(d.id):FV.add(d.id);t.textContent=on?"♡":"♥"}
- else if(d.act==="cadd"){const c=CART(),p=PCUR,q=Math.max(+$("#qt").value||p.min_qty_cartons,p.min_qty_cartons),x=c.find(i=>i.id===p.id);x?x.q=q:c.push({id:p.id,n:p.name,pr:p.carton_price,q,min:p.min_qty_cartons,s:p.store_id,sn:p.store_name,ph:p.whatsapp_phone,tr:p.tr});SAVE(c);msg("أُضيف إلى الطلبية ✓",1)}
+ else if(d.act==="cadd"){if(!me)return go("auth");const c=CART(),p=PCUR,q=Math.max(+$("#qt").value||p.min_qty_cartons,p.min_qty_cartons),o=$("#opt")?$("#opt").value:"",kid=p.id+(o?"|"+o:""),x=c.find(i=>i.id===kid);x?x.q=q:c.push({id:kid,pid:p.id,n:p.name+(o?" ("+o+")":""),pr:p.carton_price,q,min:p.min_qty_cartons,s:p.store_id,sn:p.store_name,ph:p.whatsapp_phone,tr:p.tr});SAVE(c);msg("أُضيف إلى الطلبية ✓",1)}
  else if(d.act==="cdel"){SAVE(CART().filter(i=>i.id!==d.id));cart()}
  else if(d.act==="ptog"){const p=cache.find(x=>x.id===d.id);await db.from("products").update({is_active:!p.is_active}).eq("id",d.id);prodSection(s)}
  else if(d.act==="pdel"){if(confirm("حذف هذا المنتج نهائياً؟")){await db.from("products").delete().eq("id",d.id);prodSection(s)}}
  else if(d.act==="ast"){const {error}=await db.from("stores").update({status:d.v}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"store_"+d.v,target:d.id});admin()}
  else if(d.act==="ahide"){const {error}=await db.from("products").update({is_hidden_by_admin:d.v==="1"}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"hide_"+d.v,target:d.id});admin()}
  else if(d.act==="ublk"){const {error}=await db.from("profiles").update({is_blocked:d.v==="1"}).eq("id",d.id);if(error)throw error;await db.from("admin_logs").insert({admin_id:me.id,action:"user_block_"+d.v,target:d.id});admin()}}catch(x){msg(x.message)}});
+document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href^="https://wa.me/"]');if(a&&!me){e.preventDefault();msg("سجّل الدخول لرؤية رقم المورد والتواصل معه");go("auth")}},true);
 if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
 boot();
 </script>
